@@ -1,4 +1,4 @@
-# PDF Title to Filename Ver1.00
+# PDF Title to Filename
 
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)
 ![WPF](https://img.shields.io/badge/WPF-Windows-blue.svg)
