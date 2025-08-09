@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="PdfTitleRenamer.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewmodels="clr-namespace:PdfTitleRenamer.ViewModels"
+        Title="PDF Title to Filename Ver1.00" Height="650" Width="800"
+        MinHeight="500" MinWidth="650"
+        WindowStartupLocation="CenterScreen"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver">
+
+    <Window.Background>
+        <SolidColorBrush Color="#F5F5F5"/>
+    </Window.Background>
+
+    <Grid Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="150"/>
+        </Grid.RowDefinitions>
+
+        <!-- Action Buttons and Progress -->
+        <Border Grid.Row="0" Background="#F8FAFC" Padding="6" Margin="0,0,0,6">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="2" BlurRadius="8" Opacity="0.1"/>
+            </Border.Effect>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Action Buttons (Left) -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <Button Content="📁 ファイルを選択"
+                            Command="{Binding SelectFilesCommand}"
+                            Style="{StaticResource SecondaryButton}"/>
+                    
+                    <Button Content="▶ 処理開始"
+                            Command="{Binding ProcessFilesCommand}"
+                            IsEnabled="{Binding HasFiles}"
+                            Style="{StaticResource MainButton}"/>
+                    
+                    <Button Content="🗑 クリア"
+                            Command="{Binding ClearFilesCommand}"
+                            IsEnabled="{Binding HasFiles}"
+                            Style="{StaticResource DangerButton}"/>
+                    
+                    <Button Content="？" 
+                            Width="35" Height="35"
+                            Background="#2196F3"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="16"
+                            ToolTip="アプリについて"
+                            Command="{Binding ShowAboutCommand}"
+                            Cursor="Hand"
+                            Margin="10,0,0,0"/>
+                </StackPanel>
+                
+                <!-- Progress Info (Right) -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,0,0">
+                    <!-- File Count -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,3">
+                        <TextBlock Text="📁" FontSize="11" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                        <TextBlock Text="{Binding FileCountText}" 
+                                 Foreground="#6B7280" 
+                                 FontSize="11" 
+                                 VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Progress Text -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,3">
+                        <TextBlock Text="⚙️" FontSize="11" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                        <TextBlock Text="{Binding ProgressText}" 
+                                 FontWeight="Medium" 
+                                 FontSize="11"
+                                 Foreground="#374151"
+                                 VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <!-- Progress Bar with Percentage -->
+                    <Grid>
+                        <ProgressBar Value="{Binding ProgressValue}" 
+                                   Maximum="100" 
+                                   Height="10"
+                                   Background="#E5E7EB"
+                                   HorizontalAlignment="Left"
+                                   Width="300">
+                            <ProgressBar.Foreground>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#10B981" Offset="0"/>
+                                    <GradientStop Color="#059669" Offset="1"/>
+                                </LinearGradientBrush>
+                            </ProgressBar.Foreground>
+                        </ProgressBar>
+                        <TextBlock HorizontalAlignment="Center" 
+                                 VerticalAlignment="Center" 
+                                 FontSize="8" 
+                                 FontWeight="Bold"
+                                 Foreground="White">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0:F0}%">
+                                    <Binding Path="ProgressValue"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Border Grid.Row="1" Background="White" Padding="6" Margin="0,0,0,6">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="2" BlurRadius="8" Opacity="0.1"/>
+            </Border.Effect>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- File List with Drop Zone -->
+                <Grid Grid.Row="0">
+                    <!-- Empty State Drop Zone -->
+                    <Border Background="#FAFAFA" 
+                            BorderThickness="2"
+                            BorderBrush="#E0E0E0"
+                            CornerRadius="8"
+                            Margin="0,0,0,10"
+                            x:Name="EmptyDropZone">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40">
+                            <TextBlock Text="📄" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,15" Opacity="0.6"/>
+                            <TextBlock Text="PDFファイルまたはフォルダをここにドラッグ＆ドロップ" 
+                                     FontSize="16" 
+                                     HorizontalAlignment="Center" 
+                                     FontWeight="Medium"
+                                     Foreground="Gray"/>
+                            <TextBlock Text="フォルダ内のPDFファイルも自動検索されます" 
+                                     FontSize="12" 
+                                     HorizontalAlignment="Center" 
+                                     Foreground="Gray"
+                                     Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- DataGrid -->
+                    <DataGrid ItemsSource="{Binding SelectedFiles}"
+                             Background="White"
+                             BorderThickness="1"
+                             BorderBrush="#E0E0E0"
+                             Margin="0,0,0,10"
+                             AutoGenerateColumns="False"
+                             GridLinesVisibility="Horizontal"
+                             HeadersVisibility="Column"
+                             RowHeaderWidth="0"
+                             CanUserAddRows="False"
+                             CanUserDeleteRows="False"
+                             CanUserResizeRows="False"
+                             CanUserSortColumns="False"
+                             SelectionMode="Single"
+                             AlternatingRowBackground="#F8F9FA"
+                             RowHeight="38"
+                             AllowDrop="True"
+                             Drop="DataGrid_Drop"
+                             DragOver="DataGrid_DragOver"
+                             x:Name="FileDataGrid">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#F1F3F4"/>
+                                <Setter Property="Foreground" Value="#1F2937"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="Padding" Value="8,6"/>
+                                <Setter Property="BorderBrush" Value="#E5E7EB"/>
+                                <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="White"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#F3F4F6"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#EBF4FF"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="操作" Width="60">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="✖"
+                                            Width="25" Height="25"
+                                            Background="#F44336"
+                                            Foreground="White"
+                                            BorderThickness="0"
+                                            FontSize="12"
+                                            Command="{Binding DataContext.RemoveFileCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip="削除"
+                                            Cursor="Hand"
+                                            HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        
+                        <DataGridTextColumn Header="現在の名前" 
+                                          Binding="{Binding FileName}" 
+                                          Width="2*" 
+                                          IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Padding" Value="8,6"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        
+                        <DataGridTextColumn Header="新しい名前" 
+                                          Binding="{Binding NewFileName}" 
+                                          Width="2*" 
+                                          IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Padding" Value="8,6"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="Medium"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        
+                        <DataGridTemplateColumn Header="ステータス" Width="130">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" 
+                                              HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center">
+                                        <TextBlock FontSize="14" 
+                                                 VerticalAlignment="Center" 
+                                                 Margin="0,0,4,0">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="エラー">
+                                                            <Setter Property="Text" Value="❌"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="タイトルなし">
+                                                            <Setter Property="Text" Value="⚠️"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム完了">
+                                                            <Setter Property="Text" Value="✅"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム予定">
+                                                            <Setter Property="Text" Value="📋"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="処理中...">
+                                                            <Setter Property="Text" Value="⚙️"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="変更不要">
+                                                            <Setter Property="Text" Value="ℹ️"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="待機中">
+                                                            <Setter Property="Text" Value="⏳"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Status}"
+                                                   Padding="0,8"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="12"
+                                                   ToolTip="{Binding ErrorDetails}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="エラー">
+                                                            <Setter Property="Foreground" Value="#DC2626"/>
+                                                            <Setter Property="FontWeight" Value="Medium"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="タイトルなし">
+                                                            <Setter Property="Foreground" Value="#D97706"/>
+                                                            <Setter Property="FontWeight" Value="Medium"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム完了">
+                                                            <Setter Property="Foreground" Value="#059669"/>
+                                                            <Setter Property="FontWeight" Value="Medium"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム予定">
+                                                            <Setter Property="Foreground" Value="#2563EB"/>
+                                                            <Setter Property="FontWeight" Value="Medium"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="処理中...">
+                                                            <Setter Property="Foreground" Value="#7C3AED"/>
+                                                            <Setter Property="FontWeight" Value="Medium"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
+            </Grid>
+        </Border>
+
+        <!-- Results Log -->
+        <Border Grid.Row="2" Background="#F9FAFB" Padding="6">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="2" BlurRadius="8" Opacity="0.1"/>
+            </Border.Effect>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" 
+                             Text="処理結果" 
+                             FontSize="14" 
+                             FontWeight="Medium" 
+                             Margin="0,0,0,10"/>
+                    
+                    <Button Grid.Column="1" 
+                          Content="🗑"
+                          Background="#F44336"
+                          Foreground="White"
+                          BorderThickness="0"
+                          Padding="8,5"
+                          ToolTip="ログをクリア"
+                          Command="{Binding ClearLogCommand}"
+                          Cursor="Hand"/>
+                </Grid>
+                
+                <ScrollViewer Grid.Row="1" 
+                            VerticalScrollBarVisibility="Auto" 
+                            HorizontalScrollBarVisibility="Auto">
+                    <TextBox Text="{Binding LogText}" 
+                             Background="White" 
+                             Foreground="Black" 
+                             IsReadOnly="True"
+                             Padding="10" 
+                             FontFamily="Consolas" 
+                             FontSize="11"
+                             TextWrapping="Wrap"
+                             BorderThickness="1"
+                             BorderBrush="#E0E0E0"/>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
