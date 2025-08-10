@@ -285,12 +285,8 @@ namespace PdfTitleRenamer.ViewModels
 
         private void ShowAbout()
         {
-            var message = "PDF Title to Filename Ver1.00\n\n" +
-                         "PDFファイルのメタデータからタイトルを抽出し、\n" +
-                         "ファイル名として自動設定するアプリケーションです。\n\n" +
-                         "開発: C# + WPF + Material Design";
-            
-            MessageBox.Show(message, "アプリについて", MessageBoxButton.OK, MessageBoxImage.Information);
+            var aboutWindow = new PdfTitleRenamer.Views.AboutWindow();
+            aboutWindow.ShowDialog();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

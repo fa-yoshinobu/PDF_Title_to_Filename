@@ -3,7 +3,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:viewmodels="clr-namespace:PdfTitleRenamer.ViewModels"
-        Title="PDF Title to Filename Ver1.00" Height="650" Width="800"
+        Title="PDF Title to Filename" Height="650" Width="800"
         MinHeight="500" MinWidth="650"
         WindowStartupLocation="CenterScreen"
         AllowDrop="True"
@@ -48,16 +48,16 @@
                             IsEnabled="{Binding HasFiles}"
                             Style="{StaticResource DangerButton}"/>
                     
-                    <Button Content="？" 
-                            Width="35" Height="35"
-                            Background="#2196F3"
-                            Foreground="White"
-                            BorderThickness="0"
-                            FontSize="16"
-                            ToolTip="アプリについて"
-                            Command="{Binding ShowAboutCommand}"
-                            Cursor="Hand"
-                            Margin="10,0,0,0"/>
+                            <Button Content="？"
+                Width="35" Height="35"
+                Background="#2196F3"
+                Foreground="White"
+                BorderThickness="0"
+                FontSize="16"
+                ToolTip="アプリについて・ライセンス情報"
+                Command="{Binding ShowAboutCommand}"
+                Cursor="Hand"
+                Margin="10,0,0,0"/>
                 </StackPanel>
                 
                 <!-- Progress Info (Right) -->

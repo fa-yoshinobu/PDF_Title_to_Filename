@@ -1,4 +1,4 @@
-# PDF Title to Filename Ver1.00
+# PDF Title to Filename
 
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)
 ![WPF](https://img.shields.io/badge/WPF-Windows-blue.svg)
@@ -51,6 +51,7 @@ PDFファイルのメタデータからタイトルを抽出し、そのタイ�
 - **ドラッグ&ドロップ**: ファイルまたはフォルダを直接ドロップ
 - **ステータスアイコン**: 視覚的に分かりやすい状態表示
 - **レスポンシブデザイン**: ウィンドウサイズに応じた自動調整
+- **統合アプリ情報**: タブ付きウィンドウでアプリ情報とオープンソースライセンスを表示
 
 ### ステータス表示
 - **📋 リネーム予定**: 処理待ちのファイル
@@ -134,6 +135,21 @@ dotnet publish --configuration Release
 3. **プレビュー確認**: 予想されるファイル名をテーブルで確認
 4. **処理実行**: 「処理開始」ボタンをクリック
 5. **結果確認**: ステータス列とログエリアで処理結果を確認
+6. **アプリ情報確認**: 「？」ボタンでアプリ情報とオープンソースライセンスを表示
+
+### ライセンス情報の確認
+アプリケーション内でオープンソースライセンスを確認する方法：
+
+1. **アプリ情報ウィンドウを開く**: メインウィンドウの「？」ボタンをクリック
+2. **ライセンスタブを選択**: 「オープンソースライセンス」タブをクリック
+3. **ライブラリを選択**: 各ライブラリのライセンステキストをスクロールして確認
+4. **詳細情報**: バージョン情報とライセンスの完全なテキストを表示
+
+**表示されるライセンス情報**:
+- **UglyToad.PdfPig**: Apache License 2.0（PDF処理ライブラリ）
+- **Microsoft.Extensions.DependencyInjection**: MIT License（依存性注入）
+- **Microsoft.Extensions.Logging**: MIT License（ログ機能）
+- **.NET Runtime**: MIT License（実行環境）
 
 ### 表示項目
 - **現在の名前**: 元のファイル名
@@ -179,7 +195,7 @@ dotnet publish --configuration Release
 ### 開発環境セットアップ
 ```bash
 # リポジトリのクローン
-git clone https://github.com/yourusername/PDF_Title_to_Filename.git
+git clone https://github.com/fa-yoshinobu/PDF_Title_to_Filename.git
 cd PDF_Title_to_Filename
 
 # 依存関係の復元
@@ -214,7 +230,9 @@ PDF_Title_to_Filename/
 │   │   └── RelayCommand.cs            # コマンド実装
 │   ├── Views/                         # WPF Views
 │   │   ├── MainWindow.xaml            # メインウィンドウUI
-│   │   └── MainWindow.xaml.cs         # メインウィンドウコード
+│   │   ├── MainWindow.xaml.cs         # メインウィンドウコード
+│   │   ├── AboutWindow.xaml           # 統合アプリ情報ウィンドウUI
+│   │   └── AboutWindow.xaml.cs        # 統合アプリ情報ウィンドウコード
 │   ├── App.xaml                       # アプリケーション設定
 │   └── App.xaml.cs                    # アプリケーションコード
 ├── build.bat                          # ビルドスクリプト
@@ -264,6 +282,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## 📄 オープンソースライセンス
+
+このアプリケーションは以下のオープンソースライブラリを使用しています：
+
+### 使用ライブラリとライセンス
+
+| ライブラリ | バージョン | ライセンス | 用途 |
+|-----------|-----------|-----------|------|
+| **UglyToad.PdfPig** | 1.7.0-custom-5 | Apache License 2.0 | PDFファイルのメタデータ抽出 |
+| **Microsoft.Extensions.DependencyInjection** | 8.0.0 | MIT License | 依存性注入フレームワーク |
+| **Microsoft.Extensions.Logging** | 8.0.0 | MIT License | ログ機能 |
+| **.NET Runtime** | 8.0.0 | MIT License | 実行環境 |
+
+### ライセンス表示機能
+
+アプリケーション内でオープンソースライセンスを確認できます：
+
+1. **アプリ情報ボタン**: メインウィンドウの「？」ボタンをクリック
+2. **ライセンスタブ**: 「オープンソースライセンス」タブを選択
+3. **詳細表示**: 各ライブラリの完全なライセンステキストを確認
+
+### ライセンステキスト
+
+各ライブラリの完全なライセンステキストは、アプリケーション内の「オープンソースライセンス」タブで確認できます。これには以下が含まれます：
+
+- **Apache License 2.0** (UglyToad.PdfPig)
+- **MIT License** (Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Logging, .NET Runtime)
+
+すべてのライセンスは、アプリケーション内で完全なテキストとして表示され、ユーザーが簡単にアクセスできるようになっています。
+
 ## 🤝 貢献
 
 プロジェクトへの貢献を歓迎します！
@@ -289,6 +337,11 @@ SOFTWARE.
 
 ## 🔄 更新履歴
 
+### Ver1.0.1 (2025-01-27)
+- ウィンドウタイトルからバージョン表記を削除
+- アプリ情報ウィンドウのバージョン表示を改善
+- ライセンス情報の詳細化とREADME更新
+
 ### Ver1.00 (2025-08-10)
 - 初回リリース
 - PDFタイトル抽出機能
@@ -299,4 +352,9 @@ SOFTWARE.
 - 単一実行ファイル配布
 - 包括的なエラーハンドリング
 - リアクティブUI実装
+- 統合アプリ情報・ライセンス表示機能
+  - アプリ情報とオープンソースライセンスを統合したタブ付きウィンドウ
+  - 使用ライブラリの完全なライセンステキスト表示
+  - バージョン情報とライセンス種別の詳細表示
+  - ユーザーフレンドリーなライセンス確認機能
 
