@@ -27,6 +27,12 @@ namespace PdfTitleRenamer.Services
         {
             try
             {
+                if (!File.Exists(filePath))
+                {
+                    _logger.LogError($"PDFファイルが存在しません: {filePath}");
+                    return new PdfMetadata();
+                }
+
                 using var document = PdfDocument.Open(filePath);
                 var info = document.Information;
                 
@@ -42,7 +48,7 @@ namespace PdfTitleRenamer.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error extracting metadata from PDF: {filePath}");
+                _logger.LogError(ex, $"PDFメタデータの抽出に失敗しました: {filePath}");
                 return new PdfMetadata();
             }
         }
@@ -87,10 +93,11 @@ namespace PdfTitleRenamer.Services
                 sanitized = $"_{sanitized}";
             }
 
-            // 長すぎるファイル名を切り詰め（255文字制限）
-            if (sanitized.Length > 250) // 拡張子の分を考慮
+            // 長すぎるファイル名を切り詰め（Windowsの最大パス長制限を考慮）
+            var maxLength = 240; // 拡張子とパスの分を考慮
+            if (sanitized.Length > maxLength)
             {
-                sanitized = sanitized.Substring(0, 250);
+                sanitized = sanitized.Substring(0, maxLength);
             }
 
             return sanitized;

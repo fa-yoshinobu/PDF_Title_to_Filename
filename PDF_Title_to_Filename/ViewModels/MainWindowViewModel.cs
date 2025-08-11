@@ -33,7 +33,7 @@ namespace PdfTitleRenamer.ViewModels
             
             // Commands
             SelectFilesCommand = new RelayCommand(SelectFiles);
-            ProcessFilesCommand = new RelayCommand(ProcessFiles, () => HasFiles && !IsProcessing);
+            ProcessFilesCommand = new RelayCommand(async () => await ProcessFilesAsync(), () => HasFiles && !IsProcessing);
             ClearFilesCommand = new RelayCommand(ClearFiles, () => HasFiles);
             RemoveFileCommand = new RelayCommand<FileItem>(RemoveFile);
             ClearLogCommand = new RelayCommand(ClearLog);
@@ -229,7 +229,7 @@ namespace PdfTitleRenamer.ViewModels
             }
         }
 
-        private async void ProcessFiles()
+        private async Task ProcessFilesAsync()
         {
             if (!HasFiles || IsProcessing) return;
 

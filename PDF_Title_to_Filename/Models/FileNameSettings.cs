@@ -44,9 +44,17 @@ namespace PdfTitleRenamer.Models
         // 設定ファイルパスを取得
         public static string GetSettingsFilePath()
         {
+            // 単一実行ファイルの場合を考慮して、ユーザーのドキュメントフォルダを使用
+            var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (!string.IsNullOrEmpty(documentsPath))
+            {
+                var appFolder = Path.Combine(documentsPath, "PDF_Title_to_Filename");
+                return Path.Combine(appFolder, "settings.json");
+            }
+            
+            // フォールバック: 実行ファイルと同じディレクトリ
             string? exeDirectory = null;
             
-            // 1. Process.GetCurrentProcess().MainModule.FileNameを最初に試す（最も確実）
             try
             {
                 var processPath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
@@ -60,14 +68,12 @@ namespace PdfTitleRenamer.Models
                 // エラーが発生した場合は次の方法を試す
             }
             
-            // 2. 実行ファイルの場所が取得できない場合はAssembly.GetExecutingAssembly().Locationを試す
             if (string.IsNullOrEmpty(exeDirectory))
             {
                 var exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 exeDirectory = Path.GetDirectoryName(exePath);
             }
             
-            // 3. それでも取得できない場合はBaseDirectoryを使用
             if (string.IsNullOrEmpty(exeDirectory))
             {
                 exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -133,12 +139,9 @@ namespace PdfTitleRenamer.Models
                 }
                 catch (Exception)
                 {
-                    // 代替パスとしてユーザーのドキュメントフォルダを使用
-                    var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    if (!string.IsNullOrEmpty(documentsPath))
-                    {
-                        settingsPath = Path.Combine(documentsPath, "PDF_Title_to_Filename.json");
-                    }
+                    // 書き込み権限がない場合は、一時ディレクトリを使用
+                    var tempPath = Path.GetTempPath();
+                    settingsPath = Path.Combine(tempPath, "PDF_Title_to_Filename_settings.json");
                 }
 
                 var json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });

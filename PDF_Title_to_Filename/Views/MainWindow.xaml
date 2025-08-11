@@ -286,9 +286,6 @@
                                                         <DataTrigger Binding="{Binding Status}" Value="待機中">
                                                             <Setter Property="Text" Value="⏳"/>
                                                         </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム予定">
-                                                            <Setter Property="Text" Value="📋"/>
-                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </TextBlock.Style>
@@ -332,10 +329,6 @@
                                                         <DataTrigger Binding="{Binding Status}" Value="待機中">
                                                             <Setter Property="Foreground" Value="#6B7280"/>
                                                             <Setter Property="FontWeight" Value="Normal"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム予定">
-                                                            <Setter Property="Foreground" Value="#2563EB"/>
-                                                            <Setter Property="FontWeight" Value="Medium"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
