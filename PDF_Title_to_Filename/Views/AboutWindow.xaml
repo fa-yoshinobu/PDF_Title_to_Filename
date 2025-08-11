@@ -33,7 +33,7 @@
                            Foreground="#1F2937"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,5"/>
-                <TextBlock Text="Version 1.0.1"
+                <TextBlock x:Name="VersionTextBlock" Text="Version 1.0.2"
                            FontSize="16"
                            Foreground="#6B7280"
                            HorizontalAlignment="Center"
@@ -91,22 +91,36 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="バージョン:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="1.0.1" Foreground="#6B7280"/>
+                                        <TextBlock x:Name="VersionDetailTextBlock" Grid.Row="0" Grid.Column="1" Text="1.0.2" Foreground="#6B7280"/>
                                         
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="開発言語:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="C# (.NET 8.0)" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="作者:" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="fa-yoshinobu" Foreground="#6B7280"/>
                                         
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="UI フレームワーク:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="WPF (Windows Presentation Foundation)" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="リンク:" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Foreground="#6B7280">
+                                            <Hyperlink NavigateUri="https://github.com/fa-yoshinobu/PDF_Title_to_Filename" 
+                                                       RequestNavigate="Hyperlink_RequestNavigate"
+                                                       Foreground="#3B82F6">
+                                                https://github.com/fa-yoshinobu/PDF_Title_to_Filename
+                                            </Hyperlink>
+                                        </TextBlock>
                                         
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="デザイン:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="Material Design 風" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="開発言語:" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="C# (.NET 8.0)" Foreground="#6B7280"/>
                                         
-                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="対応OS:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="4" Grid.Column="1" Text="Windows 10/11 (x64)" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="UI フレームワーク:" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="1" Text="WPF (Windows Presentation Foundation)" Foreground="#6B7280"/>
+                                        
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="デザイン:" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="1" Text="Material Design 風" Foreground="#6B7280"/>
+                                        
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="対応OS:" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="6" Grid.Column="1" Text="Windows 10/11 (x64)" Foreground="#6B7280"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>

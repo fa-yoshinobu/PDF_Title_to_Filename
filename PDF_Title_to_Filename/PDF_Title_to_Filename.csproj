@@ -12,8 +12,8 @@
     <AssemblyDescription>PDFファイルのタイトルからファイル名を自動生成するアプリケーション</AssemblyDescription>
     <AssemblyCompany>Your Company</AssemblyCompany>
     <AssemblyProduct>PDF Title to Filename</AssemblyProduct>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     

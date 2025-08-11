@@ -4,9 +4,8 @@ namespace PdfTitleRenamer.Services
 {
     public interface IPdfProcessingService
     {
-        Task<ProcessingResult> ProcessFileAsync(string filePath);
-        string? ExtractTitleFromPdf(string filePath);
-        string SanitizeFileName(string fileName);
-        string ConvertFullwidthToHalfwidth(string text);
+        PdfMetadata ExtractMetadataFromPdf(string filePath);
+        string SanitizeFileName(string fileName, bool applyNFKC = true);
+        string GetUniqueFilePath(string filePath);
     }
 }

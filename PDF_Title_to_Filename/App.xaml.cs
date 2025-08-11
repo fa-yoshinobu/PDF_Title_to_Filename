@@ -72,9 +72,11 @@ namespace PdfTitleRenamer
 
             // ViewModels
             services.AddTransient<MainWindowViewModel>();
+            services.AddTransient<SettingsWindowViewModel>();
 
             // Views
             services.AddTransient<Views.MainWindow>();
+            services.AddTransient<Views.SettingsWindow>();
         }
 
         protected override void OnExit(ExitEventArgs e)

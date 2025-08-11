@@ -48,16 +48,27 @@
                             IsEnabled="{Binding HasFiles}"
                             Style="{StaticResource DangerButton}"/>
                     
-                            <Button Content="？"
-                Width="35" Height="35"
-                Background="#2196F3"
-                Foreground="White"
-                BorderThickness="0"
-                FontSize="16"
-                ToolTip="アプリについて・ライセンス情報"
-                Command="{Binding ShowAboutCommand}"
-                Cursor="Hand"
-                Margin="10,0,0,0"/>
+                    <Button Content="⚙️"
+                            Width="35" Height="35"
+                            Background="#FF9800"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="16"
+                            ToolTip="ファイル名設定"
+                            Command="{Binding ShowSettingsCommand}"
+                            Cursor="Hand"
+                            Margin="10,0,0,0"/>
+                    
+                    <Button Content="？"
+                            Width="35" Height="35"
+                            Background="#2196F3"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="16"
+                            ToolTip="アプリについて・ライセンス情報"
+                            Command="{Binding ShowAboutCommand}"
+                            Cursor="Hand"
+                            Margin="5,0,0,0"/>
                 </StackPanel>
                 
                 <!-- Progress Info (Right) -->
@@ -246,7 +257,8 @@
                                               VerticalAlignment="Center">
                                         <TextBlock FontSize="14" 
                                                  VerticalAlignment="Center" 
-                                                 Margin="0,0,4,0">
+                                                 Margin="0,0,4,0"
+                                                 Text="⏳">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Style.Triggers>
@@ -254,6 +266,9 @@
                                                             <Setter Property="Text" Value="❌"/>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Status}" Value="タイトルなし">
+                                                            <Setter Property="Text" Value="⚠️"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="メタデータなし">
                                                             <Setter Property="Text" Value="⚠️"/>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Status}" Value="リネーム完了">
@@ -270,6 +285,9 @@
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Status}" Value="待機中">
                                                             <Setter Property="Text" Value="⏳"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム予定">
+                                                            <Setter Property="Text" Value="📋"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -291,6 +309,10 @@
                                                             <Setter Property="Foreground" Value="#D97706"/>
                                                             <Setter Property="FontWeight" Value="Medium"/>
                                                         </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="メタデータなし">
+                                                            <Setter Property="Foreground" Value="#D97706"/>
+                                                            <Setter Property="FontWeight" Value="Medium"/>
+                                                        </DataTrigger>
                                                         <DataTrigger Binding="{Binding Status}" Value="リネーム完了">
                                                             <Setter Property="Foreground" Value="#059669"/>
                                                             <Setter Property="FontWeight" Value="Medium"/>
@@ -301,6 +323,18 @@
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Status}" Value="処理中...">
                                                             <Setter Property="Foreground" Value="#7C3AED"/>
+                                                            <Setter Property="FontWeight" Value="Medium"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="変更不要">
+                                                            <Setter Property="Foreground" Value="#6B7280"/>
+                                                            <Setter Property="FontWeight" Value="Normal"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="待機中">
+                                                            <Setter Property="Foreground" Value="#6B7280"/>
+                                                            <Setter Property="FontWeight" Value="Normal"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム予定">
+                                                            <Setter Property="Foreground" Value="#2563EB"/>
                                                             <Setter Property="FontWeight" Value="Medium"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>

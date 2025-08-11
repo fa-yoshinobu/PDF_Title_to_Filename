@@ -21,92 +21,44 @@ namespace PdfTitleRenamer.Services
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
-        public async Task<ProcessingResult> ProcessFileAsync(string filePath)
-        {
-            return await Task.Run(() => ProcessFile(filePath));
-        }
 
-        private ProcessingResult ProcessFile(string filePath)
-        {
-            try
-            {
-                var originalFileName = Path.GetFileName(filePath);
-                var title = ExtractTitleFromPdf(filePath);
-                
-                if (string.IsNullOrWhiteSpace(title))
-                {
-                    return ProcessingResult.Skipped(originalFileName, "PDFにタイトル情報が見つかりませんでした");
-                }
 
-                var processedTitle = title.Normalize(System.Text.NormalizationForm.FormKC);
-                var validTitle = SanitizeFileName(processedTitle);
-                var newFileName = $"{validTitle}.pdf";
-                var newFilePath = Path.Combine(Path.GetDirectoryName(filePath)!, newFileName);
-
-                if (string.Equals(originalFileName, newFileName, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (!string.IsNullOrEmpty(title) && title.Length > 5)
-                    {
-                        return ProcessingResult.Success(originalFileName, newFileName);
-                    }
-                    else
-                    {
-                        return ProcessingResult.Skipped(originalFileName, "既に適切なファイル名です");
-                    }
-                }
-
-                newFilePath = GetUniqueFilePath(newFilePath);
-                newFileName = Path.GetFileName(newFilePath);
-                
-                File.Move(filePath, newFilePath);
-                
-                return ProcessingResult.Success(originalFileName, newFileName);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error processing file: {filePath}");
-                return ProcessingResult.Failure(Path.GetFileName(filePath), ex.Message);
-            }
-        }
-
-        public string? ExtractTitleFromPdf(string filePath)
+        public PdfMetadata ExtractMetadataFromPdf(string filePath)
         {
             try
             {
                 using var document = PdfDocument.Open(filePath);
-                var title = document.Information?.Title;
+                var info = document.Information;
                 
-                if (!string.IsNullOrWhiteSpace(title))
+                return new PdfMetadata
                 {
-                    return title.Trim();
-                }
-                
-                return null;
+                    Title = info?.Title?.Trim() ?? "",
+                    Author = info?.Author?.Trim() ?? "",
+                    Subject = info?.Subject?.Trim() ?? "",
+                    Keywords = info?.Keywords?.Trim() ?? "",
+                    Creator = info?.Creator?.Trim() ?? "",
+                    Producer = info?.Producer?.Trim() ?? ""
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error extracting title from PDF: {filePath}");
-                return null;
+                _logger.LogError(ex, $"Error extracting metadata from PDF: {filePath}");
+                return new PdfMetadata();
             }
         }
 
-        public string ConvertFullwidthToHalfwidth(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return text;
 
-            // NFKC正規化で全角英数字を半角に変換
-            return text.Normalize(NormalizationForm.FormKC);
-        }
 
-        public string SanitizeFileName(string fileName)
+        public string SanitizeFileName(string fileName, bool applyNFKC = true)
         {
             if (string.IsNullOrWhiteSpace(fileName))
                 return "Untitled";
 
+            // NFKC正規化で全角英数字を半角に変換（オプション）
+            var sanitized = applyNFKC ? fileName.Normalize(NormalizationForm.FormKC) : fileName;
+
             // ファイル名に使用できない文字を置換
             var invalidChars = Path.GetInvalidFileNameChars();
-            var sanitized = fileName;
 
             foreach (var invalidChar in invalidChars)
             {
@@ -144,7 +96,7 @@ namespace PdfTitleRenamer.Services
             return sanitized;
         }
 
-        private string GetUniqueFilePath(string filePath)
+        public string GetUniqueFilePath(string filePath)
         {
             if (!File.Exists(filePath))
                 return filePath;
@@ -166,31 +118,5 @@ namespace PdfTitleRenamer.Services
 
             return newFilePath;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }

@@ -129,10 +129,9 @@ namespace PdfTitleRenamer.Views
                     pdfFiles.AddRange(subDirFiles);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // アクセス権限エラーなどは無視して続行
-                System.Diagnostics.Debug.WriteLine($"ディレクトリアクセスエラー: {directoryPath} - {ex.Message}");
             }
             
             return pdfFiles;
