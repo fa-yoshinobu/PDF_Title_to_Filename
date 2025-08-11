@@ -102,7 +102,7 @@ namespace PdfTitleRenamer.ViewModels
                         SelectedFiles.Add(fileItem);
                         addedCount++;
                         
-                        _ = Task.Run(async () => await SetPredictedFileNameAsync(fileItem));
+                        _ = SetPredictedFileNameAsync(fileItem);
                     }
                 }
             }
@@ -430,8 +430,16 @@ namespace PdfTitleRenamer.ViewModels
 
         private void ShowAbout()
         {
-            var aboutWindow = new PdfTitleRenamer.Views.AboutWindow();
-            aboutWindow.ShowDialog();
+            try
+            {
+                var aboutWindow = new PdfTitleRenamer.Views.AboutWindow();
+                aboutWindow.Owner = Application.Current.MainWindow;
+                aboutWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                _logService.LogError($"AboutWindowの表示に失敗しました: {ex.Message}");
+            }
         }
 
         private void ShowSettings()
@@ -471,12 +479,17 @@ namespace PdfTitleRenamer.ViewModels
             }
         }
 
-        private async void UpdateAllFilePreviews()
+        private async Task UpdateAllFilePreviewsAsync()
         {
             foreach (var fileItem in SelectedFiles)
             {
                 await SetPredictedFileNameAsync(fileItem);
             }
+        }
+
+        private async void UpdateAllFilePreviews()
+        {
+            await UpdateAllFilePreviewsAsync();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

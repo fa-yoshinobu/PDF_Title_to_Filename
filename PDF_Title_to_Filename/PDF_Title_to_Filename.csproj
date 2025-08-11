@@ -10,7 +10,7 @@
 
     <AssemblyTitle>PDF Title to Filename</AssemblyTitle>
     <AssemblyDescription>PDFファイルのタイトルからファイル名を自動生成するアプリケーション</AssemblyDescription>
-    <AssemblyCompany>Your Company</AssemblyCompany>
+    <AssemblyCompany>fa-yoshinobu</AssemblyCompany>
     <AssemblyProduct>PDF Title to Filename</AssemblyProduct>
     <AssemblyVersion>1.0.2.0</AssemblyVersion>
     <FileVersion>1.0.2.0</FileVersion>
