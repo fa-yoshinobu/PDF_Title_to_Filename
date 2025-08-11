@@ -255,7 +255,7 @@ PDF_Title_to_Filename/
 ```
 MIT License
 
-Copyright (c) 2024 PDF Title to Filename
+Copyright (c) 2025 PDF Title to Filename
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
