@@ -13,7 +13,7 @@
 
 A fast and lightweight Windows application that extracts titles from PDF metadata and automatically sets them as filenames.
 
-![PDF Title to Filename](image1.png)
+![PDF Title to Filename_en](image1.png)
 
 **Ver.1.0.3** - Multi-language support and metadata processing logic improvements
 
@@ -519,7 +519,7 @@ If you have any issues or questions, please let us know on the GitHub Issues pag
 
 PDFファイルのメタデータからタイトルを抽出し、自動的にファイル名として設定する高速で軽量なWindowsアプリケーションです。
 
-![PDF Title to Filename](image2.png)
+![PDF Title to Filename_jp](image2.png)
 
 **Ver.1.0.3** - マルチランゲージ対応とメタデータ処理ロジックの改善
 
