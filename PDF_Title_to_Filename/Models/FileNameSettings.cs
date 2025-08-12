@@ -44,7 +44,15 @@ namespace PdfTitleRenamer.Models
         // 設定ファイルパスを取得
         public static string GetSettingsFilePath()
         {
-            // 単一実行ファイルの場合を考慮して、ユーザーのドキュメントフォルダを使用
+            // Windows標準のアプリケーション設定保存場所を使用
+            var localAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (!string.IsNullOrEmpty(localAppDataPath))
+            {
+                var appFolder = Path.Combine(localAppDataPath, "PDF_Title_to_Filename");
+                return Path.Combine(appFolder, "settings.json");
+            }
+            
+            // フォールバック: ユーザーのドキュメントフォルダ
             var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             if (!string.IsNullOrEmpty(documentsPath))
             {
@@ -52,7 +60,7 @@ namespace PdfTitleRenamer.Models
                 return Path.Combine(appFolder, "settings.json");
             }
             
-            // フォールバック: 実行ファイルと同じディレクトリ
+            // 最終フォールバック: 実行ファイルと同じディレクトリ
             string? exeDirectory = null;
             
             try
