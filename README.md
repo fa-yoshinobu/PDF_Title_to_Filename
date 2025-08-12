@@ -23,6 +23,7 @@ PDFファイルのメタデータからタイトルを抽出し、そのタイ�
 - **⚙️ 高度な設定機能** - ファイル名生成の詳細カスタマイズ
 - **🔤 NFKC正規化制御** - 全角→半角変換の項目別制御
 - **📋 メタデータなし対応** - 設定に応じた柔軟な処理
+- **🛡️ 堅牢なエラーハンドリング** - 包括的な例外処理とリカバリ機能
 
 ## 🎯 パフォーマンス最適化
 
@@ -44,6 +45,7 @@ PDFファイルのメタデータからタイトルを抽出し、そのタイ�
 - **フォルダ再帰検索**: ドロップしたフォルダ内の全PDFファイルを自動検索
 - **設定ベース処理**: 有効なメタデータ項目のみを考慮した処理
 - **メタデータなし判定**: 設定で有効なメタデータがすべて空の場合の適切な処理
+- **エンコーディング対応**: Shift_JISなどの追加エンコーディング対応
 
 ### ユーザーインターフェース
 - **表形式表示**: 現在の名前、新しい名前、ステータスを一覧表示
@@ -73,7 +75,7 @@ PDFファイルのメタデータからタイトルを抽出し、そのタイ�
 - **カスタム文字列**: プレフィックス・サフィックスの自由な設定
 - **セパレータ設定**: 要素間の区切り文字のカスタマイズ
 - **リアルタイムプレビュー**: 設定変更時の即座なプレビュー更新
-- **設定の永続化**: 実行ファイルと同じフォルダへの設定保存
+- **設定の永続化**: ユーザーのドキュメントフォルダへの設定保存
 
 ## 🛠️ 技術仕様
 
@@ -86,6 +88,7 @@ PDFファイルのメタデータからタイトルを抽出し、そのタイ�
 - **UglyToad.PdfPig** - 高速PDF処理
 - **Microsoft.Extensions.DependencyInjection** - 依存性注入
 - **Microsoft.Extensions.Logging** - 最小構成ログ
+- **System.Text.Encoding.CodePages** - 追加エンコーディング対応
 
 ### アーキテクチャ
 - **MVVM パターン** - Model-View-ViewModel設計
@@ -103,6 +106,7 @@ PDFファイルのメタデータからタイトルを抽出し、そのタイ�
 - **無効文字除去**: Windows無効文字の自動置換
 - **予約語回避**: Windows予約語の自動回避
 - **重複処理**: 連番付与による重複回避
+- **ファイル存在チェック**: 処理前のファイル存在確認
 
 #### ビューモデル (MainWindowViewModel)
 - **リアクティブ更新**: PropertyChangedによるUI自動更新
@@ -184,6 +188,7 @@ dotnet publish --configuration Release
 - **UglyToad.PdfPig**: Apache License 2.0（PDF処理ライブラリ）
 - **Microsoft.Extensions.DependencyInjection**: MIT License（依存性注入）
 - **Microsoft.Extensions.Logging**: MIT License（ログ機能）
+- **System.Text.Encoding.CodePages**: MIT License（エンコーディング対応）
 - **.NET Runtime**: MIT License（実行環境）
 
 ### 表示項目
@@ -199,7 +204,7 @@ dotnet publish --configuration Release
 2. **無効文字除去**: Windows無効文字 (`< > : " / \\ | ? *`) → `_`
 3. **空白正規化**: 連続する空白 → 単一空白
 4. **予約語回避**: Windows予約語の自動回避
-5. **長さ制限**: 250文字制限での自動切り詰め
+5. **長さ制限**: 240文字制限での自動切り詰め（Windowsの最大パス長制限を考慮）
 
 ### 重複処理
 ```
@@ -219,6 +224,7 @@ dotnet publish --configuration Release
 - **重複エラー**: 同名ファイルの自動連番付与
 - **権限エラー**: 読み取り専用ファイルの処理スキップ
 - **ドラッグ&ドロップエラー**: 無効なファイル形式の適切な処理
+- **設定ファイルエラー**: 設定保存・読み込みエラーの適切な処理
 
 ### フォルダ再帰検索
 - **サブフォルダ検索**: 指定フォルダ内の全サブフォルダを再帰的に検索
@@ -278,6 +284,7 @@ PDF_Title_to_Filename/
 ├── build.bat                          # ビルドスクリプト
 ├── build.ps1                          # PowerShellビルドスクリプト
 ├── README.md                          # プロジェクト説明
+├── BUGFIXES.md                        # バグ修正履歴
 └── .gitignore                         # Git除外設定
 ```
 
@@ -334,6 +341,7 @@ SOFTWARE.
 | **UglyToad.PdfPig** | 1.7.0-custom-5 | Apache License 2.0 | PDFファイルのメタデータ抽出 |
 | **Microsoft.Extensions.DependencyInjection** | 8.0.0 | MIT License | 依存性注入フレームワーク |
 | **Microsoft.Extensions.Logging** | 8.0.0 | MIT License | ログ機能 |
+| **System.Text.Encoding.CodePages** | 8.0.0 | MIT License | 追加エンコーディング対応 |
 | **.NET Runtime** | 8.0.0 | MIT License | 実行環境 |
 
 ### ライセンス表示機能
@@ -349,7 +357,7 @@ SOFTWARE.
 各ライブラリの完全なライセンステキストは、アプリケーション内の「オープンソースライセンス」タブで確認できます。これには以下が含まれます：
 
 - **Apache License 2.0** (UglyToad.PdfPig)
-- **MIT License** (Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Logging, .NET Runtime)
+- **MIT License** (Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Logging, System.Text.Encoding.CodePages, .NET Runtime)
 
 すべてのライセンスは、アプリケーション内で完全なテキストとして表示され、ユーザーが簡単にアクセスできるようになっています。
 
@@ -397,12 +405,22 @@ SOFTWARE.
 - **UI改善**
   - 設定ウィンドウの追加（⚙️ボタン）
   - ステータスアイコンの完全対応
-  - 設定ファイルの永続化（PDF_Title_to_Filename.json）
+  - 設定ファイルの永続化（ユーザーのドキュメントフォルダ）
 - **技術的改善**
   - MVVMパターンの完全実装
   - 依存性注入の活用
   - 設定ベースの処理ロジック
   - エラーハンドリングの強化
+- **バグ修正**
+  - CodePagesEncodingProviderの依存関係追加
+  - 設定ファイルの保存パス改善
+  - UIの重複DataTrigger修正
+  - 非同期処理の改善
+  - 例外処理の強化
+  - ファイル名長制限の改善
+  - ライブラリ情報の完全記載
+  - バージョン情報の整合性
+  - アセンブリ情報の完全設定
 
 ### Ver1.0.1 (2025-08-10)
 - ウィンドウタイトルからバージョン表記を削除
