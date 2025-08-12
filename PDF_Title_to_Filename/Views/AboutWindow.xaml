@@ -2,7 +2,7 @@
 <Window x:Class="PdfTitleRenamer.Views.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="アプリについて"
+        Title="{Binding AboutWindowTitle}"
         Height="700"
         Width="900"
         MinHeight="500"
@@ -33,12 +33,12 @@
                            Foreground="#1F2937"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,5"/>
-                <TextBlock x:Name="VersionTextBlock" Text="Version 1.0.2"
+                <TextBlock x:Name="VersionTextBlock" Text="Version 1.0.3"
                            FontSize="16"
                            Foreground="#6B7280"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,10"/>
-                <TextBlock Text="PDFファイルのメタデータからタイトルを抽出し、ファイル名として自動設定するアプリケーションです"
+                <TextBlock Text="{Binding AppDescription}"
                            FontSize="14"
                            Foreground="#374151"
                            HorizontalAlignment="Center"
@@ -59,7 +59,7 @@
                         Margin="0">
                 
                 <!-- アプリについてタブ -->
-                <TabItem Header="アプリについて" 
+                <TabItem Header="{Binding AboutTab}" 
                          FontSize="14"
                          FontWeight="Medium">
                     <ScrollViewer VerticalScrollBarVisibility="Auto"
@@ -74,7 +74,7 @@
                                     BorderThickness="1"
                                     BorderBrush="#E2E8F0">
                                 <StackPanel>
-                                    <TextBlock Text="📱 アプリケーション情報"
+                                    <TextBlock Text="{Binding AppInfoHeader}"
                                                FontSize="18"
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
@@ -95,13 +95,13 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="バージョン:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock x:Name="VersionDetailTextBlock" Grid.Row="0" Grid.Column="1" Text="1.0.2" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding VersionLabel}" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock x:Name="VersionDetailTextBlock" Grid.Row="0" Grid.Column="1" Text="1.0.3" Foreground="#6B7280"/>
                                         
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="作者:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="fa-yoshinobu" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding AuthorLabel}" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding AuthorValue}" Foreground="#6B7280"/>
                                         
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="リンク:" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding LinkLabel}" FontWeight="Medium" Foreground="#374151"/>
                                         <TextBlock Grid.Row="2" Grid.Column="1" Foreground="#6B7280">
                                             <Hyperlink NavigateUri="https://github.com/fa-yoshinobu/PDF_Title_to_Filename" 
                                                        RequestNavigate="Hyperlink_RequestNavigate"
@@ -110,17 +110,17 @@
                                             </Hyperlink>
                                         </TextBlock>
                                         
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="開発言語:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="C# (.NET 8.0)" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding DevelopmentLanguageLabel}" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DevelopmentLanguageValue}" Foreground="#6B7280"/>
                                         
-                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="UI フレームワーク:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="4" Grid.Column="1" Text="WPF (Windows Presentation Foundation)" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{Binding UIFrameworkLabel}" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding UIFrameworkValue}" Foreground="#6B7280"/>
                                         
-                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="デザイン:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="5" Grid.Column="1" Text="Material Design 風" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="{Binding DesignLabel}" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding DesignValue}" Foreground="#6B7280"/>
                                         
-                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="対応OS:" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock Grid.Row="6" Grid.Column="1" Text="Windows 10/11 (x64)" Foreground="#6B7280"/>
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="{Binding SupportedOSLabel}" FontWeight="Medium" Foreground="#374151"/>
+                                        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding SupportedOSValue}" Foreground="#6B7280"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -133,34 +133,34 @@
                                     BorderThickness="1"
                                     BorderBrush="#E2E8F0">
                                 <StackPanel>
-                                    <TextBlock Text="⚡ 主な機能"
+                                    <TextBlock Text="{Binding MainFeaturesHeader}"
                                                FontSize="18"
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,15"/>
                                     
                                     <StackPanel>
-                                        <TextBlock Text="• PDFファイルのメタデータからタイトル情報を自動抽出"
+                                        <TextBlock Text="{Binding Feature1}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
-                                        <TextBlock Text="• 抽出したタイトルをファイル名として自動設定"
+                                        <TextBlock Text="{Binding Feature2}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
-                                        <TextBlock Text="• 複数ファイルの一括処理対応"
+                                        <TextBlock Text="{Binding Feature3}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
-                                        <TextBlock Text="• 処理状況のリアルタイム表示"
+                                        <TextBlock Text="{Binding Feature4}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
-                                        <TextBlock Text="• エラーハンドリングとログ機能"
+                                        <TextBlock Text="{Binding Feature5}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
-                                        <TextBlock Text="• ドラッグ&amp;ドロップ対応"
+                                        <TextBlock Text="{Binding Feature6}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
@@ -175,26 +175,26 @@
                                     BorderThickness="1"
                                     BorderBrush="#E2E8F0">
                                 <StackPanel>
-                                    <TextBlock Text="📖 使用方法"
+                                    <TextBlock Text="{Binding UsageHeader}"
                                                FontSize="18"
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,15"/>
                                     
                                     <StackPanel>
-                                        <TextBlock Text="1. 「ファイル選択」ボタンでPDFファイルを選択"
+                                        <TextBlock Text="{Binding Usage1}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
-                                        <TextBlock Text="2. または、PDFファイルをウィンドウにドラッグ&amp;ドロップ"
+                                        <TextBlock Text="{Binding Usage2}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
-                                        <TextBlock Text="3. 「処理開始」ボタンでファイル名の変更を実行"
+                                        <TextBlock Text="{Binding Usage3}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
-                                        <TextBlock Text="4. 処理状況と結果をログで確認"
+                                        <TextBlock Text="{Binding Usage4}"
                                                    FontSize="14"
                                                    Foreground="#374151"
                                                    Margin="0,0,0,8"/>
@@ -207,7 +207,7 @@
                 </TabItem>
 
                 <!-- オープンソースライセンスタブ -->
-                <TabItem Header="オープンソースライセンス" 
+                <TabItem Header="{Binding LicenseTab}" 
                          FontSize="14"
                          FontWeight="Medium">
                     <ScrollViewer VerticalScrollBarVisibility="Auto"
@@ -231,11 +231,13 @@
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
-                                    <TextBlock Text="ライセンス: Apache License 2.0"
-                                               FontSize="14"
+                                    <TextBlock FontSize="14"
                                                Foreground="#059669"
                                                FontWeight="Medium"
-                                               Margin="0,0,0,15"/>
+                                               Margin="0,0,0,15">
+                                        <Run Text="{Binding LicenseLabel}"/>
+                                        <Run Text=" Apache License 2.0"/>
+                                    </TextBlock>
                                     <TextBlock TextWrapping="Wrap"
                                                FontSize="13"
                                                Foreground="#374151"
@@ -271,11 +273,13 @@
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
-                                    <TextBlock Text="ライセンス: MIT License"
-                                               FontSize="14"
+                                    <TextBlock FontSize="14"
                                                Foreground="#059669"
                                                FontWeight="Medium"
-                                               Margin="0,0,0,15"/>
+                                               Margin="0,0,0,15">
+                                        <Run Text="{Binding LicenseLabel}"/>
+                                        <Run Text=" MIT License"/>
+                                    </TextBlock>
                                     <TextBlock TextWrapping="Wrap"
                                                FontSize="13"
                                                Foreground="#374151"
@@ -311,11 +315,13 @@
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
-                                    <TextBlock Text="ライセンス: MIT License"
-                                               FontSize="14"
+                                    <TextBlock FontSize="14"
                                                Foreground="#059669"
                                                FontWeight="Medium"
-                                               Margin="0,0,0,15"/>
+                                               Margin="0,0,0,15">
+                                        <Run Text="{Binding LicenseLabel}"/>
+                                        <Run Text=" MIT License"/>
+                                    </TextBlock>
                                     <TextBlock TextWrapping="Wrap"
                                                FontSize="13"
                                                Foreground="#374151"
@@ -351,11 +357,13 @@
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
-                                    <TextBlock Text="ライセンス: MIT License"
-                                               FontSize="14"
+                                    <TextBlock FontSize="14"
                                                Foreground="#059669"
                                                FontWeight="Medium"
-                                               Margin="0,0,0,15"/>
+                                               Margin="0,0,0,15">
+                                        <Run Text="{Binding LicenseLabel}"/>
+                                        <Run Text=" MIT License"/>
+                                    </TextBlock>
                                     <TextBlock TextWrapping="Wrap"
                                                FontSize="13"
                                                Foreground="#374151"
@@ -390,11 +398,13 @@
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
-                                    <TextBlock Text="ライセンス: MIT License"
-                                               FontSize="14"
+                                    <TextBlock FontSize="14"
                                                Foreground="#059669"
                                                FontWeight="Medium"
-                                               Margin="0,0,0,15"/>
+                                               Margin="0,0,0,15">
+                                        <Run Text="{Binding LicenseLabel}"/>
+                                        <Run Text=" MIT License"/>
+                                    </TextBlock>
                                     <TextBlock TextWrapping="Wrap"
                                                FontSize="13"
                                                Foreground="#374151"

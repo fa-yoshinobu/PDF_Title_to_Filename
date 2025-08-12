@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
+using PdfTitleRenamer.Services;
 
 namespace PdfTitleRenamer.Models
 {
@@ -8,11 +9,17 @@ namespace PdfTitleRenamer.Models
     {
         private bool _isEnabled;
         private string _elementType = string.Empty;
+        public static ILanguageService? _languageService;
 
         public FileNameElement(string elementType, bool isEnabled = true)
         {
             ElementType = elementType;
             IsEnabled = isEnabled;
+        }
+
+        public static void SetLanguageService(ILanguageService languageService)
+        {
+            _languageService = languageService;
         }
 
         public string ElementType
@@ -26,13 +33,13 @@ namespace PdfTitleRenamer.Models
         {
             get => ElementType switch
             {
-                "Title" => "PDFのタイトル",
-                "Author" => "PDFの作成者",
-                "Subject" => "PDFのサブタイトル",
-                "Keywords" => "PDFのキーワード",
-                "OriginalFileName" => "変更前のファイル名",
-                "CustomPrefix" => "プレフィックス",
-                "CustomSuffix" => "サフィックス",
+                "Title" => _languageService?.GetString("PDFTitleDisplay") ?? "PDF Title",
+                "Author" => _languageService?.GetString("PDFAuthorDisplay") ?? "PDF Author",
+                "Subject" => _languageService?.GetString("PDFSubjectDisplay") ?? "PDF Subject",
+                "Keywords" => _languageService?.GetString("PDFKeywordsDisplay") ?? "PDF Keywords",
+                "OriginalFileName" => _languageService?.GetString("OriginalFileNameDisplay") ?? "Original File Name",
+                "CustomPrefix" => _languageService?.GetString("CustomPrefixDisplay") ?? "Prefix",
+                "CustomSuffix" => _languageService?.GetString("CustomSuffixDisplay") ?? "Suffix",
                 _ => ElementType
             };
         }

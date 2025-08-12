@@ -1,6 +1,9 @@
 using System.Windows;
 using System.Diagnostics;
 using PdfTitleRenamer.Helpers;
+using PdfTitleRenamer.ViewModels;
+using PdfTitleRenamer.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PdfTitleRenamer.Views
 {
@@ -9,9 +12,16 @@ namespace PdfTitleRenamer.Views
     /// </summary>
     public partial class AboutWindow : Window
     {
+        private readonly ILanguageService _languageService;
+
         public AboutWindow()
         {
             InitializeComponent();
+            
+            // ViewModelを設定
+            _languageService = GetLanguageService();
+            DataContext = new AboutWindowViewModel(_languageService);
+            
             SetVersionInfo();
         }
 
@@ -19,7 +29,29 @@ namespace PdfTitleRenamer.Views
         {
             InitializeComponent();
             Owner = owner;
+            
+            // ViewModelを設定
+            _languageService = GetLanguageService();
+            DataContext = new AboutWindowViewModel(_languageService);
+            
             SetVersionInfo();
+        }
+
+        private ILanguageService GetLanguageService()
+        {
+            try
+            {
+                if (App.Current is App app && app.Services != null)
+                {
+                    return app.Services.GetService<ILanguageService>() ?? new LanguageService();
+                }
+            }
+            catch
+            {
+                // エラーが発生した場合はデフォルトのLanguageServiceを作成
+            }
+            
+            return new LanguageService();
         }
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
@@ -49,7 +81,7 @@ namespace PdfTitleRenamer.Views
                 // バージョン情報をUIに設定
                 if (VersionTextBlock != null)
                 {
-                    VersionTextBlock.Text = $"Version {version}";
+                    VersionTextBlock.Text = $"{_languageService?.GetString("VersionPrefix") ?? "Version"} {version}";
                 }
                 
                 if (VersionDetailTextBlock != null)

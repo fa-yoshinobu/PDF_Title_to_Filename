@@ -14,6 +14,8 @@
         <SolidColorBrush Color="#F5F5F5"/>
     </Window.Background>
 
+
+
     <Grid Margin="6">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -34,41 +36,69 @@
                 
                 <!-- Action Buttons (Left) -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,20,0">
-                    <Button Content="📁 ファイルを選択"
-                            Command="{Binding SelectFilesCommand}"
-                            Style="{StaticResource SecondaryButton}"/>
+                    <Button Command="{Binding SelectFilesCommand}"
+                            Style="{StaticResource SecondaryButton}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📁" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding FileSelectionText}"/>
+                        </StackPanel>
+                    </Button>
                     
-                    <Button Content="▶ 処理開始"
-                            Command="{Binding ProcessFilesCommand}"
+                    <Button Command="{Binding ProcessFilesCommand}"
                             IsEnabled="{Binding HasFiles}"
-                            Style="{StaticResource MainButton}"/>
+                            Style="{StaticResource MainButton}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="▶" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding ProcessStartText}"/>
+                        </StackPanel>
+                    </Button>
                     
-                    <Button Content="🗑 クリア"
-                            Command="{Binding ClearFilesCommand}"
+                    <Button Command="{Binding ClearFilesCommand}"
                             IsEnabled="{Binding HasFiles}"
-                            Style="{StaticResource DangerButton}"/>
+                            Style="{StaticResource DangerButton}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🗑" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding ClearListText}"/>
+                        </StackPanel>
+                    </Button>
                     
-                    <Button Content="⚙️"
-                            Width="35" Height="35"
-                            Background="#FF9800"
-                            Foreground="White"
-                            BorderThickness="0"
-                            FontSize="16"
-                            ToolTip="ファイル名設定"
-                            Command="{Binding ShowSettingsCommand}"
-                            Cursor="Hand"
-                            Margin="10,0,0,0"/>
+                                         <Button Content="⚙️"
+                             Width="35" Height="35"
+                             Background="#FF9800"
+                             Foreground="White"
+                             BorderThickness="0"
+                             FontSize="16"
+                             ToolTip="{Binding SettingsToolTip}"
+                             Command="{Binding ShowSettingsCommand}"
+                             Cursor="Hand"
+                             Margin="10,0,0,0"/>
                     
-                    <Button Content="？"
-                            Width="35" Height="35"
-                            Background="#2196F3"
-                            Foreground="White"
-                            BorderThickness="0"
-                            FontSize="16"
-                            ToolTip="アプリについて・ライセンス情報"
-                            Command="{Binding ShowAboutCommand}"
-                            Cursor="Hand"
-                            Margin="5,0,0,0"/>
+                                         <Button Content="？"
+                             Width="35" Height="35"
+                             Background="#2196F3"
+                             Foreground="White"
+                             BorderThickness="0"
+                             FontSize="16"
+                             ToolTip="{Binding AboutToolTip}"
+                             Command="{Binding ShowAboutCommand}"
+                             Cursor="Hand"
+                             Margin="5,0,0,0"/>
+                    
+                                         <Button Command="{Binding ChangeLanguageCommand}"
+                             CommandParameter="{Binding CurrentLanguageDisplay, Converter={StaticResource LanguageToggleConverter}}"
+                             Width="90" Height="35"
+                             Background="#9C27B0"
+                             Foreground="White"
+                             BorderThickness="0"
+                             FontSize="13"
+                             ToolTip="{Binding LanguageToolTip}"
+                             Cursor="Hand"
+                             Margin="5,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🌐" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding CurrentLanguageDisplay}"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
                 
                 <!-- Progress Info (Right) -->
@@ -144,12 +174,12 @@
                             x:Name="EmptyDropZone">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40">
                             <TextBlock Text="📄" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,15" Opacity="0.6"/>
-                            <TextBlock Text="PDFファイルまたはフォルダをここにドラッグ＆ドロップ" 
+                            <TextBlock Text="{Binding DragDropFilesText}" 
                                      FontSize="16" 
                                      HorizontalAlignment="Center" 
                                      FontWeight="Medium"
                                      Foreground="Gray"/>
-                            <TextBlock Text="フォルダ内のPDFファイルも自動検索されます" 
+                            <TextBlock Text="{Binding DragDropSubText}" 
                                      FontSize="12" 
                                      HorizontalAlignment="Center" 
                                      Foreground="Gray"
@@ -203,8 +233,8 @@
                                 </Style.Triggers>
                             </Style>
                         </DataGrid.RowStyle>
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="操作" Width="60">
+                                         <DataGrid.Columns>
+                         <DataGridTemplateColumn Header="{Binding DataContext.OperationHeader, RelativeSource={RelativeSource AncestorType=DataGrid}}" Width="60">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Content="✖"
@@ -215,17 +245,17 @@
                                             FontSize="12"
                                             Command="{Binding DataContext.RemoveFileCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
-                                            ToolTip="削除"
+                                            ToolTip="{Binding DataContext.DeleteToolTip, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             Cursor="Hand"
                                             HorizontalAlignment="Center"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         
-                        <DataGridTextColumn Header="現在の名前" 
-                                          Binding="{Binding FileName}" 
-                                          Width="2*" 
-                                          IsReadOnly="True">
+                                                 <DataGridTextColumn Header="{Binding DataContext.CurrentNameHeader, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                           Binding="{Binding FileName}" 
+                                           Width="2*" 
+                                           IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Padding" Value="8,6"/>
@@ -235,10 +265,10 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         
-                        <DataGridTextColumn Header="新しい名前" 
-                                          Binding="{Binding NewFileName}" 
-                                          Width="2*" 
-                                          IsReadOnly="True">
+                                                                          <DataGridTextColumn Header="{Binding DataContext.NewNameHeader, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                            Binding="{Binding NewFileNameDisplay}" 
+                                            Width="2*" 
+                                            IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Padding" Value="8,6"/>
@@ -249,7 +279,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         
-                        <DataGridTemplateColumn Header="ステータス" Width="130">
+                                                 <DataGridTemplateColumn Header="{Binding DataContext.StatusHeader, RelativeSource={RelativeSource AncestorType=DataGrid}}" Width="130">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" 
@@ -261,78 +291,78 @@
                                                  Text="⏳">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Status}" Value="エラー">
-                                                            <Setter Property="Text" Value="❌"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="タイトルなし">
-                                                            <Setter Property="Text" Value="⚠️"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="メタデータなし">
-                                                            <Setter Property="Text" Value="⚠️"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム完了">
-                                                            <Setter Property="Text" Value="✅"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム予定">
-                                                            <Setter Property="Text" Value="📋"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="処理中...">
-                                                            <Setter Property="Text" Value="⚙️"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="変更不要">
-                                                            <Setter Property="Text" Value="ℹ️"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="待機中">
-                                                            <Setter Property="Text" Value="⏳"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
+                                                                                                         <Style.Triggers>
+                                                         <DataTrigger Binding="{Binding Status}" Value="Error">
+                                                             <Setter Property="Text" Value="❌"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="NoTitle">
+                                                             <Setter Property="Text" Value="⚠️"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="NoMetadata">
+                                                             <Setter Property="Text" Value="⚠️"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="RenameComplete">
+                                                             <Setter Property="Text" Value="✅"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="RenameScheduled">
+                                                             <Setter Property="Text" Value="📋"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="Processing">
+                                                             <Setter Property="Text" Value="⚙️"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="NoChangeNeeded">
+                                                             <Setter Property="Text" Value="ℹ️"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="Waiting">
+                                                             <Setter Property="Text" Value="⏳"/>
+                                                         </DataTrigger>
+                                                     </Style.Triggers>
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
-                                        <TextBlock Text="{Binding Status}"
+                                        <TextBlock Text="{Binding StatusDisplay}"
                                                    Padding="0,8"
                                                    VerticalAlignment="Center"
                                                    FontSize="12"
                                                    ToolTip="{Binding ErrorDetails}">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Status}" Value="エラー">
-                                                            <Setter Property="Foreground" Value="#DC2626"/>
-                                                            <Setter Property="FontWeight" Value="Medium"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="タイトルなし">
-                                                            <Setter Property="Foreground" Value="#D97706"/>
-                                                            <Setter Property="FontWeight" Value="Medium"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="メタデータなし">
-                                                            <Setter Property="Foreground" Value="#D97706"/>
-                                                            <Setter Property="FontWeight" Value="Medium"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム完了">
-                                                            <Setter Property="Foreground" Value="#059669"/>
-                                                            <Setter Property="FontWeight" Value="Medium"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="リネーム予定">
-                                                            <Setter Property="Foreground" Value="#2563EB"/>
-                                                            <Setter Property="FontWeight" Value="Medium"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="処理中...">
-                                                            <Setter Property="Foreground" Value="#7C3AED"/>
-                                                            <Setter Property="FontWeight" Value="Medium"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="変更不要">
-                                                            <Setter Property="Foreground" Value="#6B7280"/>
-                                                            <Setter Property="FontWeight" Value="Normal"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="待機中">
-                                                            <Setter Property="Foreground" Value="#6B7280"/>
-                                                            <Setter Property="FontWeight" Value="Normal"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
+                                                                                         <TextBlock.Style>
+                                                 <Style TargetType="TextBlock">
+                                                     <Style.Triggers>
+                                                         <DataTrigger Binding="{Binding Status}" Value="Error">
+                                                             <Setter Property="Foreground" Value="#DC2626"/>
+                                                             <Setter Property="FontWeight" Value="Medium"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="NoTitle">
+                                                             <Setter Property="Foreground" Value="#D97706"/>
+                                                             <Setter Property="FontWeight" Value="Medium"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="NoMetadata">
+                                                             <Setter Property="Foreground" Value="#D97706"/>
+                                                             <Setter Property="FontWeight" Value="Medium"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="RenameComplete">
+                                                             <Setter Property="Foreground" Value="#059669"/>
+                                                             <Setter Property="FontWeight" Value="Medium"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="RenameScheduled">
+                                                             <Setter Property="Foreground" Value="#2563EB"/>
+                                                             <Setter Property="FontWeight" Value="Medium"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="Processing">
+                                                             <Setter Property="Foreground" Value="#7C3AED"/>
+                                                             <Setter Property="FontWeight" Value="Medium"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="NoChangeNeeded">
+                                                             <Setter Property="Foreground" Value="#6B7280"/>
+                                                             <Setter Property="FontWeight" Value="Normal"/>
+                                                         </DataTrigger>
+                                                         <DataTrigger Binding="{Binding Status}" Value="Waiting">
+                                                             <Setter Property="Foreground" Value="#6B7280"/>
+                                                             <Setter Property="FontWeight" Value="Normal"/>
+                                                         </DataTrigger>
+                                                     </Style.Triggers>
+                                                 </Style>
+                                             </TextBlock.Style>
                                         </TextBlock>
                                     </StackPanel>
                                 </DataTemplate>
@@ -363,20 +393,20 @@
                     </Grid.ColumnDefinitions>
                     
                     <TextBlock Grid.Column="0" 
-                             Text="処理結果" 
+                             Text="{Binding ProcessingLogText}" 
                              FontSize="14" 
                              FontWeight="Medium" 
                              Margin="0,0,0,10"/>
                     
-                    <Button Grid.Column="1" 
-                          Content="🗑"
-                          Background="#F44336"
-                          Foreground="White"
-                          BorderThickness="0"
-                          Padding="8,5"
-                          ToolTip="ログをクリア"
-                          Command="{Binding ClearLogCommand}"
-                          Cursor="Hand"/>
+                                         <Button Grid.Column="1" 
+                           Content="🗑"
+                           Background="#F44336"
+                           Foreground="White"
+                           BorderThickness="0"
+                           Padding="8,5"
+                           ToolTip="{Binding ClearLogToolTip}"
+                           Command="{Binding ClearLogCommand}"
+                           Cursor="Hand"/>
                 </Grid>
                 
                 <ScrollViewer Grid.Row="1" 

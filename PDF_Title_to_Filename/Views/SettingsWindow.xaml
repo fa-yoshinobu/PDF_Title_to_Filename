@@ -1,7 +1,7 @@
 <Window x:Class="PdfTitleRenamer.Views.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ファイル名設定" Height="600" Width="700" 
+        Title="{Binding SettingsWindowTitle}" Height="600" Width="700" 
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
         Background="#F5F5F5">
     
@@ -59,7 +59,7 @@
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <!-- ファイル名要素の選択 -->
-                <GroupBox Header="ファイル名に含める要素（矢印ボタンで順序変更可能）" Style="{StaticResource GroupBoxStyle}">
+                <GroupBox Header="{Binding FileNameElementsHeader}" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -130,7 +130,7 @@
                         
                         <!-- 説明テキスト -->
                         <TextBlock Grid.Row="1" 
-                                   Text="チェックボックスで有効/無効を切り替え、矢印ボタンで順序を変更できます。プレフィックスとサフィックスも位置を変更可能です。"
+                                   Text="{Binding ElementsDescription}"
                                    Foreground="#666666"
                                    FontSize="11"
                                    Margin="0,5,0,0"/>
@@ -138,7 +138,7 @@
                 </GroupBox>
 
                 <!-- カスタム文字列設定 -->
-                <GroupBox Header="カスタム文字列設定" Style="{StaticResource GroupBoxStyle}">
+                <GroupBox Header="{Binding CustomStringSettingsHeader}" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -149,48 +149,48 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <Label Grid.Row="0" Grid.Column="0" Content="プレフィックス:" VerticalAlignment="Center"/>
+                        <Label Grid.Row="0" Grid.Column="0" Content="{Binding PrefixLabel}" VerticalAlignment="Center"/>
                         <TextBox Grid.Row="0" Grid.Column="1" 
                                  Text="{Binding Settings.CustomPrefix, UpdateSourceTrigger=PropertyChanged}" 
                                  Style="{StaticResource TextBoxStyle}"
-                                 ToolTip="プレフィックスとして使用する文字列（上記の要素リストで有効にしてください）"
+                                 ToolTip="{Binding PrefixToolTip}"
                                  TextChanged="TextBox_TextChanged"/>
                         
-                        <Label Grid.Row="1" Grid.Column="0" Content="サフィックス:" VerticalAlignment="Center"/>
+                        <Label Grid.Row="1" Grid.Column="0" Content="{Binding SuffixLabel}" VerticalAlignment="Center"/>
                         <TextBox Grid.Row="1" Grid.Column="1" 
                                  Text="{Binding Settings.CustomSuffix, UpdateSourceTrigger=PropertyChanged}" 
                                  Style="{StaticResource TextBoxStyle}"
-                                 ToolTip="サフィックスとして使用する文字列（上記の要素リストで有効にしてください）"
+                                 ToolTip="{Binding SuffixToolTip}"
                                  TextChanged="TextBox_TextChanged"/>
                     </Grid>
                 </GroupBox>
 
                 <!-- セパレータ設定 -->
-                <GroupBox Header="セパレータ設定" Style="{StaticResource GroupBoxStyle}">
+                <GroupBox Header="{Binding SeparatorSettingsHeader}" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <Label Grid.Column="0" Content="要素間の区切り文字:" VerticalAlignment="Center"/>
+                        <Label Grid.Column="0" Content="{Binding SeparatorLabel}" VerticalAlignment="Center"/>
                         <TextBox Grid.Column="1" 
                                  Text="{Binding Settings.Separator, UpdateSourceTrigger=PropertyChanged}" 
                                  Style="{StaticResource TextBoxStyle}"
-                                 ToolTip="複数の要素を結合する際の区切り文字"
+                                 ToolTip="{Binding SeparatorToolTip}"
                                  TextChanged="TextBox_TextChanged"/>
                     </Grid>
                 </GroupBox>
 
                 <!-- プレビュー -->
-                <GroupBox Header="プレビュー" Style="{StaticResource GroupBoxStyle}">
+                <GroupBox Header="{Binding PreviewHeader}" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         
-                        <Label Grid.Row="0" Content="生成されるファイル名:" FontWeight="Bold"/>
+                        <Label Grid.Row="0" Content="{Binding PreviewLabel}" FontWeight="Bold"/>
                         <TextBox Grid.Row="1" 
                                  Text="{Binding PreviewFileName}" 
                                  Style="{StaticResource TextBoxStyle}"
@@ -204,13 +204,13 @@
 
         <!-- ボタンエリア -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="保存" 
+            <Button Content="{Binding SaveButton}" 
                     Command="{Binding SaveCommand}" 
                     Style="{StaticResource SaveButtonStyle}"/>
-            <Button Content="リセット" 
+            <Button Content="{Binding ResetButton}" 
                     Command="{Binding ResetCommand}" 
                     Style="{StaticResource ResetButtonStyle}"/>
-            <Button Content="キャンセル" 
+            <Button Content="{Binding CancelButton}" 
                     Command="{Binding CancelCommand}" 
                     Style="{StaticResource CancelButtonStyle}"/>
         </StackPanel>

@@ -13,10 +13,12 @@ namespace PdfTitleRenamer.Models
         {
             FilePath = filePath;
             FileName = Path.GetFileName(filePath);
-            _newFileName = "処理待ち...";
-            _status = "待機中";
+            _newFileName = "ProcessingPending";
+            _status = "Waiting"; // 定数を使用する場合は、MainWindowViewModelから定数を参照する必要があります
             _errorDetails = "";
         }
+
+
 
         public string FilePath { get; }
         public string FileName { get; }
@@ -28,6 +30,20 @@ namespace PdfTitleRenamer.Models
             {
                 _newFileName = value;
                 OnPropertyChanged(nameof(NewFileName));
+                OnPropertyChanged(nameof(NewFileNameDisplay));
+            }
+        }
+
+        // 表示用のファイル名（ローカライズ対応）
+        public string NewFileNameDisplay
+        {
+            get
+            {
+                if (FileNameElement._languageService != null)
+                {
+                    return FileNameElement._languageService.GetString(_newFileName) ?? _newFileName;
+                }
+                return _newFileName;
             }
         }
         
@@ -38,6 +54,7 @@ namespace PdfTitleRenamer.Models
             {
                 _status = value;
                 OnPropertyChanged(nameof(Status));
+                OnPropertyChanged(nameof(StatusDisplay));
             }
         }
         
@@ -51,11 +68,31 @@ namespace PdfTitleRenamer.Models
             }
         }
 
+        // 表示用の状態文字列（ローカライズ対応）
+        public string StatusDisplay
+        {
+            get
+            {
+                if (FileNameElement._languageService != null)
+                {
+                    return FileNameElement._languageService.GetString(Status) ?? Status;
+                }
+                return Status;
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        // 言語変更時にStatusDisplayとNewFileNameDisplayを更新するための公開メソッド
+        public void UpdateStatusDisplay()
+        {
+            OnPropertyChanged(nameof(StatusDisplay));
+            OnPropertyChanged(nameof(NewFileNameDisplay));
         }
     }
 }

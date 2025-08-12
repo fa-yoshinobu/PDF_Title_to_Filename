@@ -11,6 +11,9 @@ namespace PdfTitleRenamer
     public partial class App : Application
     {
         private ServiceProvider? _serviceProvider;
+        private ILanguageService? _languageService;
+        
+        public IServiceProvider Services => _serviceProvider ?? throw new InvalidOperationException("Services not initialized");
 
         public App()
         {
@@ -28,6 +31,7 @@ namespace PdfTitleRenamer
                 var serviceCollection = new ServiceCollection();
                 ConfigureServices(serviceCollection);
                 _serviceProvider = serviceCollection.BuildServiceProvider();
+                _languageService = _serviceProvider.GetRequiredService<ILanguageService>();
 
                 var mainWindow = _serviceProvider.GetRequiredService<Views.MainWindow>();
                 
@@ -45,9 +49,9 @@ namespace PdfTitleRenamer
             catch (Exception ex)
             {
                 // ユーザーにエラーを表示
-                MessageBox.Show($"アプリケーションの起動に失敗しました。\n\n" +
-                              $"エラー: {ex.Message}", 
-                              "起動エラー", 
+                MessageBox.Show($"{_languageService?.GetString("AppStartupError")}\n\n" +
+                              $"{_languageService?.GetString("ErrorPrefix") ?? "Error:"} {ex.Message}", 
+                              _languageService?.GetString("StartupErrorTitle") ?? "Startup Error", 
                               MessageBoxButton.OK, 
                               MessageBoxImage.Error);
                 
@@ -70,6 +74,9 @@ namespace PdfTitleRenamer
             // PDF処理サービス
             services.AddSingleton<IPdfProcessingService, PdfProcessingService>();
 
+            // 言語サービス
+            services.AddSingleton<ILanguageService, LanguageService>();
+
             // ViewModels
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<SettingsWindowViewModel>();
@@ -90,9 +97,9 @@ namespace PdfTitleRenamer
         {
             try
             {
-                MessageBox.Show($"アプリケーションでエラーが発生しました。\n\n" +
-                              $"エラー: {e.Exception.Message}", 
-                              "アプリケーションエラー", 
+                MessageBox.Show($"{_languageService?.GetString("AppError")}\n\n" +
+                              $"{_languageService?.GetString("ErrorPrefix") ?? "Error:"} {e.Exception.Message}", 
+                              _languageService?.GetString("AppErrorTitle") ?? "Application Error", 
                               MessageBoxButton.OK, 
                               MessageBoxImage.Error);
                 

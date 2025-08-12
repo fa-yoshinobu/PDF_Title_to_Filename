@@ -194,54 +194,10 @@ namespace PdfTitleRenamer.Models
         // テンプレートからファイル名を生成
         public string GenerateFileName(string originalFileName, string title, string author, string subject, string keywords)
         {
-            // 取得対象として設定されているメタデータがすべて空の場合は空文字列を返す（リネームしない）
-            var hasMetadata = false;
-            
-            // 有効なメタデータ要素をチェック
-            foreach (var element in Elements.Where(e => e.IsEnabled))
-            {
-                switch (element.ElementType)
-                {
-                    case "Title":
-                        if (!string.IsNullOrWhiteSpace(title))
-                        {
-                            hasMetadata = true;
-                            break;
-                        }
-                        break;
-                    case "Author":
-                        if (!string.IsNullOrWhiteSpace(author))
-                        {
-                            hasMetadata = true;
-                            break;
-                        }
-                        break;
-                    case "Subject":
-                        if (!string.IsNullOrWhiteSpace(subject))
-                        {
-                            hasMetadata = true;
-                            break;
-                        }
-                        break;
-                    case "Keywords":
-                        if (!string.IsNullOrWhiteSpace(keywords))
-                        {
-                            hasMetadata = true;
-                            break;
-                        }
-                        break;
-                }
-                
-                // メタデータが見つかったらループを抜ける
-                if (hasMetadata) break;
-            }
-            
-            if (!hasMetadata)
-            {
-                return "";
-            }
-
             var parts = new List<string>();
+
+            // ログサービスは直接取得できないため、ログ出力は行わない
+            // 代わりにMainWindowViewModelでログを出力する
 
             // 有効な要素を順序に従って追加
             foreach (var element in Elements.Where(e => e.IsEnabled))
@@ -264,10 +220,10 @@ namespace PdfTitleRenamer.Models
                 }
             }
 
-            // パーツがない場合は元のファイル名を使用
+            // パーツがない場合は空文字列を返す（メタデータなしとして処理）
             if (parts.Count == 0)
             {
-                return Path.GetFileNameWithoutExtension(originalFileName);
+                return "";
             }
 
             // セパレータで結合
@@ -275,10 +231,38 @@ namespace PdfTitleRenamer.Models
         }
 
         // プレビュー用のファイル名生成
-        public string GeneratePreviewFileName(string originalFileName = "sample.pdf", string title = "サンプルタイトル", 
-            string author = "作成者名", string subject = "サブタイトル", string keywords = "キーワード")
+        public string GeneratePreviewFileName(string originalFileName = "sample.pdf", string? title = null, 
+            string? author = null, string? subject = null, string? keywords = null)
         {
-            return GenerateFileName(originalFileName, title, author, subject, keywords);
+            // デフォルト値を動的に取得
+            var defaultTitle = title ?? GetDefaultPreviewValue("SampleTitle");
+            var defaultAuthor = author ?? GetDefaultPreviewValue("SampleAuthor");
+            var defaultSubject = subject ?? GetDefaultPreviewValue("SampleSubject");
+            var defaultKeywords = keywords ?? GetDefaultPreviewValue("SampleKeywords");
+            
+            return GenerateFileName(originalFileName, defaultTitle, defaultAuthor, defaultSubject, defaultKeywords);
+        }
+
+        private string GetDefaultPreviewValue(string key)
+        {
+            // LanguageServiceが利用可能な場合はローカライズされた値を取得
+            if (FileNameElement._languageService != null)
+            {
+                return FileNameElement._languageService.GetString(key) ?? GetFallbackValue(key);
+            }
+            return GetFallbackValue(key);
+        }
+
+        private string GetFallbackValue(string key)
+        {
+            return key switch
+            {
+                "SampleTitle" => "Sample Title",
+                "SampleAuthor" => "Author Name",
+                "SampleSubject" => "Subject",
+                "SampleKeywords" => "Keywords",
+                _ => "Unknown"
+            };
         }
 
         // 要素の有効状態を取得

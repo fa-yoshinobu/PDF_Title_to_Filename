@@ -12,10 +12,14 @@
     <AssemblyDescription>PDFファイルのタイトルからファイル名を自動生成するアプリケーション</AssemblyDescription>
     <AssemblyCompany>fa-yoshinobu</AssemblyCompany>
     <AssemblyProduct>PDF Title to Filename</AssemblyProduct>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
-    <FileVersion>1.0.2.0</FileVersion>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <FileVersion>1.0.3.0</FileVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    
+    <!-- ログ出力制御のdefine文 -->
+    <DefineConstants Condition="'$(Configuration)' == 'Debug'">$(DefineConstants);ENABLE_DETAILED_LOGGING</DefineConstants>
     
     <!-- 単一実行ファイルの設定 -->
     <PublishSingleFile>true</PublishSingleFile>
@@ -40,6 +44,13 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Strings.resx" />
+    <EmbeddedResource Include="Resources\Strings.jp.resx">
+      <DependentUpon>Strings.resx</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve">
+    <value>PDF Title to Filename</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>PDFファイルのメタデータからタイトルを抽出し、ファイル名として自動設定するアプリケーションです</value>
+  </data>
+  <data name="FileSelection" xml:space="preserve">
+    <value>ファイル選択</value>
+  </data>
+  <data name="ProcessStart" xml:space="preserve">
+    <value>処理開始</value>
+  </data>
+  <data name="ClearList" xml:space="preserve">
+    <value>リストクリア</value>
+  </data>
+  <data name="CurrentName" xml:space="preserve">
+    <value>現在の名前</value>
+  </data>
+  <data name="NewName" xml:space="preserve">
+    <value>新しい名前</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>ステータス</value>
+  </data>
+  <data name="Operation" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="Waiting" xml:space="preserve">
+    <value>待機中</value>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>処理中...</value>
+  </data>
+  <data name="RenameCompleted" xml:space="preserve">
+    <value>リネーム完了</value>
+  </data>
+  <data name="NoTitle" xml:space="preserve">
+    <value>タイトルなし</value>
+  </data>
+  <data name="NoMetadata" xml:space="preserve">
+    <value>メタデータなし</value>
+  </data>
+  <data name="NoChangeNeeded" xml:space="preserve">
+    <value>変更不要</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>エラー</value>
+  </data>
+  <data name="RenameScheduled" xml:space="preserve">
+    <value>リネーム予定</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>アプリについて</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="Japanese" xml:space="preserve">
+    <value>Japanese</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="FileNameElements" xml:space="preserve">
+    <value>ファイル名要素</value>
+  </data>
+  <data name="ElementOrder" xml:space="preserve">
+    <value>要素の順序（矢印ボタンで変更可能）</value>
+  </data>
+  <data name="CustomPrefix" xml:space="preserve">
+    <value>プレフィックス</value>
+  </data>
+  <data name="CustomSuffix" xml:space="preserve">
+    <value>サフィックス</value>
+  </data>
+  <data name="Separator" xml:space="preserve">
+    <value>セパレータ</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>プレビュー</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>リセット</value>
+  </data>
+  <data name="PdfTitle" xml:space="preserve">
+    <value>PDFのタイトル</value>
+  </data>
+  <data name="PdfAuthor" xml:space="preserve">
+    <value>PDFの作成者</value>
+  </data>
+  <data name="PdfSubject" xml:space="preserve">
+    <value>PDFのサブタイトル</value>
+  </data>
+  <data name="PdfKeywords" xml:space="preserve">
+    <value>PDFのキーワード</value>
+  </data>
+  <data name="OriginalFileName" xml:space="preserve">
+    <value>変更前のファイル名</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>バージョン</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="Link" xml:space="preserve">
+    <value>リンク</value>
+  </data>
+  <data name="DevelopmentLanguage" xml:space="preserve">
+    <value>開発言語</value>
+  </data>
+  <data name="UIFramework" xml:space="preserve">
+    <value>UI フレームワーク</value>
+  </data>
+  <data name="Design" xml:space="preserve">
+    <value>デザイン</value>
+  </data>
+  <data name="SupportedOS" xml:space="preserve">
+    <value>対応OS</value>
+  </data>
+  <data name="MainFeatures" xml:space="preserve">
+    <value>主な機能</value>
+  </data>
+  <data name="Usage" xml:space="preserve">
+    <value>使用方法</value>
+  </data>
+  <data name="OpenSourceLicenses" xml:space="preserve">
+    <value>オープンソースライセンス</value>
+  </data>
+  <data name="License" xml:space="preserve">
+    <value>ライセンス</value>
+  </data>
+  <data name="DragDropFiles" xml:space="preserve">
+    <value>PDFファイルをここにドラッグ&amp;ドロップ</value>
+  </data>
+  <data name="Or" xml:space="preserve">
+    <value>または</value>
+  </data>
+  <data name="ClickToSelect" xml:space="preserve">
+    <value>クリックしてファイルを選択</value>
+  </data>
+  <data name="ProcessingLog" xml:space="preserve">
+    <value>処理ログ</value>
+  </data>
+  <data name="NoFilesSelected" xml:space="preserve">
+    <value>ファイルが選択されていません</value>
+  </data>
+  <data name="ProcessingComplete" xml:space="preserve">
+    <value>処理完了</value>
+  </data>
+  <data name="ProcessingFailed" xml:space="preserve">
+    <value>処理失敗</value>
+  </data>
+  <data name="SampleTitle" xml:space="preserve">
+    <value>サンプルタイトル</value>
+  </data>
+  <data name="SampleAuthor" xml:space="preserve">
+    <value>作成者名</value>
+  </data>
+  <data name="SampleSubject" xml:space="preserve">
+    <value>サブタイトル</value>
+  </data>
+  <data name="SampleKeywords" xml:space="preserve">
+    <value>キーワード</value>
+  </data>
+  <data name="SampleFileName" xml:space="preserve">
+    <value>sample.pdf</value>
+  </data>
+  <data name="FilesSelected" xml:space="preserve">
+    <value>ファイル選択済み</value>
+  </data>
+  <data name="ProcessingResults" xml:space="preserve">
+    <value>処理結果</value>
+  </data>
+  <data name="NoMetadataSettingsWarning" xml:space="preserve">
+    <value>PDFメタデータ項目（タイトル、作成者、サブタイトル、キーワード）がすべて無効になっています。少なくとも1つの項目を有効にしてください。</value>
+  </data>
+  <data name="NoMetadataSettingsWarningTitle" xml:space="preserve">
+    <value>設定警告</value>
+  </data>
+</root>

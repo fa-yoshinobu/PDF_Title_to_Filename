@@ -11,15 +11,17 @@ namespace PdfTitleRenamer.Services
     {
         private readonly ILogger<PdfProcessingService> _logger;
         private readonly ILogService _logService;
+        private readonly ILanguageService _languageService;
 
-            public PdfProcessingService(ILogger<PdfProcessingService> logger, ILogService logService)
-    {
-        _logger = logger;
-        _logService = logService;
-        
-        // .NET 8でShift_JISなどの追加エンコーディングを使用可能にする
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-    }
+        public PdfProcessingService(ILogger<PdfProcessingService> logger, ILogService logService, ILanguageService languageService)
+        {
+            _logger = logger;
+            _logService = logService;
+            _languageService = languageService;
+            
+            // .NET 8でShift_JISなどの追加エンコーディングを使用可能にする
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        }
 
 
 
@@ -29,14 +31,14 @@ namespace PdfTitleRenamer.Services
             {
                 if (!File.Exists(filePath))
                 {
-                    _logger.LogError($"PDFファイルが存在しません: {filePath}");
+                    _logger.LogError($"{_languageService?.GetString("PDFFileNotFound") ?? "PDF file not found"}: {filePath}");
                     return new PdfMetadata();
                 }
 
                 using var document = PdfDocument.Open(filePath);
                 var info = document.Information;
                 
-                return new PdfMetadata
+                var metadata = new PdfMetadata
                 {
                     Title = info?.Title?.Trim() ?? "",
                     Author = info?.Author?.Trim() ?? "",
@@ -45,10 +47,14 @@ namespace PdfTitleRenamer.Services
                     Creator = info?.Creator?.Trim() ?? "",
                     Producer = info?.Producer?.Trim() ?? ""
                 };
+
+
+
+                return metadata;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"PDFメタデータの抽出に失敗しました: {filePath}");
+                _logger.LogError(ex, $"{_languageService?.GetString("PDFMetadataExtractionFailed") ?? "PDF metadata extraction failed"}: {filePath}");
                 return new PdfMetadata();
             }
         }

@@ -1,3 +1,8 @@
+// ログ出力の制御
+#if DEBUG
+#define ENABLE_DETAILED_LOGGING
+#endif
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -12,33 +17,67 @@ namespace PdfTitleRenamer.ViewModels
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        // 状態定数（言語に依存しない）
+        private const string STATUS_WAITING = "Waiting";
+        private const string STATUS_PROCESSING = "Processing";
+        private const string STATUS_RENAME_COMPLETE = "RenameComplete";
+        private const string STATUS_RENAME_SCHEDULED = "RenameScheduled";
+        private const string STATUS_NO_TITLE = "NoTitle";
+        private const string STATUS_NO_METADATA = "NoMetadata";
+        private const string STATUS_NO_CHANGE_NEEDED = "NoChangeNeeded";
+        private const string STATUS_ERROR = "Error";
+
         private readonly IPdfProcessingService _pdfProcessingService;
         private readonly ILogService _logService;
+        private readonly ILanguageService _languageService;
         private readonly FileNameSettings _settings;
 
         private string _logText = "";
-        private string _progressText = "準備完了";
+        private string _progressText = "";
         private double _progressValue = 0;
         private bool _isProcessing = false;
 
         public MainWindowViewModel(
             IPdfProcessingService pdfProcessingService,
-            ILogService logService)
+            ILogService logService,
+            ILanguageService languageService)
         {
-            _pdfProcessingService = pdfProcessingService;
-            _logService = logService;
+            _pdfProcessingService = pdfProcessingService ?? throw new ArgumentNullException(nameof(pdfProcessingService));
+            _logService = logService ?? throw new ArgumentNullException(nameof(logService));
+            _languageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
             _settings = FileNameSettings.Load();
+
+            // 言語変更イベントを購読
+#pragma warning disable CS8602 // null 参照の可能性があるものの逆参照です
+            _languageService.LanguageChanged += (s, e) => {
+                OnPropertyChanged(string.Empty);
+                // FileItemのStatusDisplayも更新
+                foreach (var fileItem in SelectedFiles)
+                {
+                    fileItem.UpdateStatusDisplay();
+                }
+            };
+#pragma warning restore CS8602
+
+            // ログサービスのイベントを購読
+            _logService.LogAdded += (s, e) => {
+                LogText = e;
+            };
+
+            // FileNameElementにLanguageServiceを設定
+            FileNameElement.SetLanguageService(_languageService);
 
             SelectedFiles = new ObservableCollection<FileItem>();
             
             // Commands
             SelectFilesCommand = new RelayCommand(SelectFiles);
-            ProcessFilesCommand = new RelayCommand(async () => await ProcessFilesAsync(), () => HasFiles && !IsProcessing);
+            ProcessFilesCommand = new RelayCommand(async () => await ProcessFilesAsync(), () => HasFiles && !IsProcessing && HasValidMetadataSettings());
             ClearFilesCommand = new RelayCommand(ClearFiles, () => HasFiles);
             RemoveFileCommand = new RelayCommand<FileItem>(RemoveFile);
             ClearLogCommand = new RelayCommand(ClearLog);
             ShowAboutCommand = new RelayCommand(ShowAbout);
             ShowSettingsCommand = new RelayCommand(ShowSettings);
+            ChangeLanguageCommand = new RelayCommand<string>(ChangeLanguage);
 
             // Subscribe to property changes to update command states
             PropertyChanged += (s, e) => {
@@ -47,6 +86,11 @@ namespace PdfTitleRenamer.ViewModels
                     (ProcessFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
                     (ClearFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
+            };
+            
+            // 設定変更時にコマンドの状態を更新
+            _settings.Elements.CollectionChanged += (s, e) => {
+                (ProcessFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
             };
         }
 
@@ -60,7 +104,7 @@ namespace PdfTitleRenamer.ViewModels
 
         public string ProgressText
         {
-            get => _progressText;
+            get => string.IsNullOrEmpty(_progressText) ? _languageService?.GetString("Ready") ?? "Ready" : _progressText;
             set => SetProperty(ref _progressText, value);
         }
 
@@ -78,7 +122,43 @@ namespace PdfTitleRenamer.ViewModels
 
         public bool HasFiles => SelectedFiles.Count > 0;
 
-        public string FileCountText => $"{SelectedFiles.Count} ファイル選択済み";
+        public string FileCountText => $"{SelectedFiles.Count} {_languageService?.GetString("FilesSelected") ?? "Files Selected"}";
+
+        // UI文字列プロパティ
+        public string FileSelectionText => _languageService.GetString("FileSelection");
+        public string ProcessStartText => _languageService.GetString("ProcessStart");
+        public string ClearListText => _languageService.GetString("ClearList");
+        public string CurrentNameText => _languageService.GetString("CurrentName");
+        public string NewNameText => _languageService.GetString("NewName");
+        public string StatusText => _languageService.GetString("Status");
+        public string OperationText => _languageService.GetString("Operation");
+        public string ProcessingLogText => _languageService.GetString("ProcessingResults");
+        public string DragDropFilesText => _languageService.GetString("DragDropFiles");
+        public string DragDropSubText => _languageService.GetString("DragDropSubText");
+        public string OrText => _languageService.GetString("Or");
+        public string ClickToSelectText => _languageService.GetString("ClickToSelect");
+        public string SettingsToolTip => _languageService.GetString("SettingsToolTip");
+        public string AboutToolTip => _languageService.GetString("AboutToolTip");
+        public string LanguageToolTip => _languageService.GetString("LanguageToolTip");
+        public string DeleteToolTip => _languageService.GetString("DeleteToolTip");
+        public string ClearLogToolTip => _languageService.GetString("ClearLogToolTip");
+        public string OperationHeader => _languageService.GetString("OperationHeader");
+        public string CurrentNameHeader => _languageService.GetString("CurrentNameHeader");
+        public string NewNameHeader => _languageService.GetString("NewNameHeader");
+        public string StatusHeader => _languageService.GetString("StatusHeader");
+
+        // 現在の言語を表示するプロパティ
+        public string CurrentLanguageDisplay => _languageService.CurrentLanguage == "ja" ? "Japanese" : "English";
+
+        // Status strings for DataGrid triggers
+        public string Error => _languageService.GetString("Error");
+        public string NoTitle => _languageService.GetString("NoTitle");
+        public string NoMetadata => _languageService.GetString("NoMetadata");
+        public string RenameComplete => _languageService.GetString("RenameComplete");
+        public string RenameScheduled => _languageService.GetString("RenameScheduled");
+        public string Processing => _languageService.GetString("Processing");
+        public string NoChangeNeeded => _languageService.GetString("NoChangeNeeded");
+        public string Waiting => _languageService.GetString("Waiting");
 
         // Commands
         public ICommand SelectFilesCommand { get; }
@@ -88,6 +168,7 @@ namespace PdfTitleRenamer.ViewModels
         public ICommand ClearLogCommand { get; }
         public ICommand ShowAboutCommand { get; }
         public ICommand ShowSettingsCommand { get; }
+        public ICommand ChangeLanguageCommand { get; }
 
         public void AddFiles(string[] filePaths)
         {
@@ -117,75 +198,72 @@ namespace PdfTitleRenamer.ViewModels
             {
                 var metadata = await Task.Run(() => _pdfProcessingService.ExtractMetadataFromPdf(fileItem.FilePath));
                 
+#if ENABLE_DETAILED_LOGGING
                 // デバッグ用ログ
-                _logService.LogInfo($"PDFメタデータ: Title='{metadata.Title}', Author='{metadata.Author}', Subject='{metadata.Subject}', Keywords='{metadata.Keywords}'");
+                _logService.LogInfo($"{_languageService.GetString("PDFMetadataLog")}: Title='{metadata.Title}', Author='{metadata.Author}', Subject='{metadata.Subject}', Keywords='{metadata.Keywords}'");
                 
-                // 取得対象として設定されているメタデータがすべて空の場合は「メタデータなし」として処理
-                var hasMetadata = false;
+                // 有効な要素のデバッグログ
+                var enabledElements = _settings.Elements.Where(e => e.IsEnabled).ToList();
+                _logService.LogInfo($"Enabled elements: {string.Join(", ", enabledElements.Select(e => e.ElementType))}");
+                _logService.LogInfo($"Total elements: {_settings.Elements.Count}, Enabled: {enabledElements.Count}");
                 
-                // 有効なメタデータ要素をチェック
-                foreach (var element in _settings.Elements.Where(e => e.IsEnabled))
+                // メタデータの詳細ログ
+                _logService.LogInfo($"Metadata details - Title: '{metadata.Title}' (Length: {metadata.Title?.Length ?? 0})");
+                _logService.LogInfo($"Metadata details - Author: '{metadata.Author}' (Length: {metadata.Author?.Length ?? 0})");
+                _logService.LogInfo($"Metadata details - Subject: '{metadata.Subject}' (Length: {metadata.Subject?.Length ?? 0})");
+                _logService.LogInfo($"Metadata details - Keywords: '{metadata.Keywords}' (Length: {metadata.Keywords?.Length ?? 0})");
+                
+                // ファイル名生成の詳細ログ
+                _logService.LogInfo($"GenerateFileName input - Title: '{metadata.Title ?? string.Empty}', Author: '{metadata.Author ?? string.Empty}', Subject: '{metadata.Subject ?? string.Empty}', Keywords: '{metadata.Keywords ?? string.Empty}'");
+                
+                // 設定の詳細ログ
+                _logService.LogInfo($"Settings - Separator: '{_settings.Separator}', CustomPrefix: '{_settings.CustomPrefix}', CustomSuffix: '{_settings.CustomSuffix}'");
+                _logService.LogInfo($"Settings Elements:");
+                foreach (var element in _settings.Elements)
                 {
-                    switch (element.ElementType)
-                    {
-                        case "Title":
-                            if (!string.IsNullOrWhiteSpace(metadata.Title))
-                            {
-                                hasMetadata = true;
-                                break;
-                            }
-                            break;
-                        case "Author":
-                            if (!string.IsNullOrWhiteSpace(metadata.Author))
-                            {
-                                hasMetadata = true;
-                                break;
-                            }
-                            break;
-                        case "Subject":
-                            if (!string.IsNullOrWhiteSpace(metadata.Subject))
-                            {
-                                hasMetadata = true;
-                                break;
-                            }
-                            break;
-                        case "Keywords":
-                            if (!string.IsNullOrWhiteSpace(metadata.Keywords))
-                            {
-                                hasMetadata = true;
-                                break;
-                            }
-                            break;
-                    }
-                    
-                    // メタデータが見つかったらループを抜ける
-                    if (hasMetadata) break;
+                    _logService.LogInfo($"  - {element.ElementType}: Enabled={element.IsEnabled}");
                 }
+#endif
                 
-                if (!hasMetadata)
-                {
-                    fileItem.NewFileName = "メタデータなし";
-                    fileItem.Status = "メタデータなし";
-                    fileItem.ErrorDetails = "PDFファイルにメタデータ情報が設定されていません";
-                    return;
-                }
+
                 
-                // 設定に基づいてファイル名を生成
+                // 設定に基づいてファイル名を生成（メタデータチェックも含む）
                 var generatedFileName = _settings.GenerateFileName(
                     fileItem.FileName,
-                    metadata.Title,
-                    metadata.Author,
-                    metadata.Subject,
-                    metadata.Keywords);
+                    metadata.Title ?? string.Empty,
+                    metadata.Author ?? string.Empty,
+                    metadata.Subject ?? string.Empty,
+                    metadata.Keywords ?? string.Empty);
 
-                _logService.LogInfo($"生成されたファイル名: '{generatedFileName}'");
+#if ENABLE_DETAILED_LOGGING
+                // ファイル名生成の詳細ログ
+                _logService.LogInfo($"Generated filename: '{generatedFileName}'");
+                _logService.LogInfo($"Enabled elements count: {_settings.Elements.Count(e => e.IsEnabled)}");
+                foreach (var element in _settings.Elements.Where(e => e.IsEnabled))
+                {
+                    var elementValue = element.ElementType switch
+                    {
+                        "Title" => metadata.Title,
+                        "Author" => metadata.Author,
+                        "Subject" => metadata.Subject,
+                        "Keywords" => metadata.Keywords,
+                        "OriginalFileName" => Path.GetFileNameWithoutExtension(fileItem.FileName),
+                        "CustomPrefix" => _settings.CustomPrefix,
+                        "CustomSuffix" => _settings.CustomSuffix,
+                        _ => "Unknown"
+                    };
+                    _logService.LogInfo($"  Element '{element.ElementType}': '{elementValue}' (IsEmpty: {string.IsNullOrWhiteSpace(elementValue)})");
+                }
+#endif
 
-                // 生成されたファイル名が空または無効な場合
+                _logService.LogInfo($"{_languageService.GetString("GeneratedFileNameLog")}: '{generatedFileName}'");
+
+                // 生成されたファイル名が空の場合は「メタデータなし」
                 if (string.IsNullOrWhiteSpace(generatedFileName))
                 {
-                    fileItem.NewFileName = "タイトルなし";
-                    fileItem.Status = "タイトルなし";
-                    fileItem.ErrorDetails = "PDFファイルにメタデータ情報が設定されていません";
+                    fileItem.NewFileName = "NoMetadata";
+                    fileItem.Status = STATUS_NO_METADATA;
+                    fileItem.ErrorDetails = _languageService.GetString("NoMetadataError");
                     return;
                 }
 
@@ -198,19 +276,19 @@ namespace PdfTitleRenamer.ViewModels
                 // 元のファイル名と予想ファイル名を比較
                 if (string.Equals(fileItem.FileName, predictedFileName, StringComparison.OrdinalIgnoreCase))
                 {
-                    fileItem.Status = "変更不要";
-                    fileItem.ErrorDetails = "ファイル名は既に適切に設定されています";
+                    fileItem.Status = STATUS_NO_CHANGE_NEEDED;
+                    fileItem.ErrorDetails = _languageService.GetString("AlreadyProperlySet");
                 }
                 else
                 {
-                    fileItem.Status = "リネーム予定";
+                    fileItem.Status = STATUS_RENAME_SCHEDULED;
                 }
             }
             catch (Exception ex)
             {
-                fileItem.NewFileName = "エラー";
-                fileItem.Status = "エラー";
-                fileItem.ErrorDetails = $"メタデータ抽出エラー: {ex.Message}";
+                fileItem.NewFileName = "Error";
+                fileItem.Status = STATUS_ERROR;
+                fileItem.ErrorDetails = $"{_languageService.GetString("MetadataExtractionError")}: {ex.Message}";
             }
         }
 
@@ -218,9 +296,9 @@ namespace PdfTitleRenamer.ViewModels
         {
             var openFileDialog = new OpenFileDialog
             {
-                Filter = "PDFファイル (*.pdf)|*.pdf",
+                Filter = _languageService.GetString("PDFFileFilter"),
                 Multiselect = true,
-                Title = "処理するPDFファイルを選択してください"
+                Title = _languageService.GetString("SelectPDFFilesTitle")
             };
 
             if (openFileDialog.ShowDialog() == true)
@@ -233,17 +311,29 @@ namespace PdfTitleRenamer.ViewModels
         {
             if (!HasFiles || IsProcessing) return;
 
+            // PDFメタデータ項目がすべて無効な場合の警告
+            if (!HasValidMetadataSettings())
+            {
+                MessageBox.Show(
+                    _languageService.GetString("NoMetadataSettingsWarning"),
+                    _languageService.GetString("NoMetadataSettingsWarningTitle"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
             IsProcessing = true;
             ProgressValue = 0;
-            ProgressText = "処理中...";
+            ProgressText = _languageService.GetString("Processing");
 
             try
             {
                 var allFiles = SelectedFiles.ToList();
+                // 状態比較は固定文字列を使用（言語に依存しない）
                 var filesToProcess = allFiles.Where(f => 
-                    f.Status != "リネーム完了" && 
-                    f.Status != "タイトルなし" && 
-                    f.Status != "変更不要").ToList();
+                    f.Status != STATUS_RENAME_COMPLETE && 
+                    f.Status != STATUS_NO_TITLE && 
+                    f.Status != STATUS_NO_CHANGE_NEEDED).ToList();
                 var skippedCount = allFiles.Count - filesToProcess.Count;
                 var totalFiles = filesToProcess.Count;
                 var processedFiles = 0;
@@ -251,11 +341,11 @@ namespace PdfTitleRenamer.ViewModels
                 var skippedInProcessCount = 0;
                 var errorCount = 0;
 
-                LogText = $"処理開始: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n";
-                LogText += $"対象ファイル数: {totalFiles}";
+                LogText = $"{_languageService.GetString("ProcessingStartLog")}: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n";
+                LogText += $"{_languageService.GetString("TargetFileCountLog")}: {totalFiles}";
                 if (skippedCount > 0)
                 {
-                    LogText += $" (スキップ: {skippedCount}件)";
+                    LogText += $" ({_languageService.GetString("SkippedCountLog")}: {skippedCount}{_languageService.GetString("FilesUnit")})";
                 }
                 LogText += "\n\n";
 
@@ -264,115 +354,66 @@ namespace PdfTitleRenamer.ViewModels
                     try
                     {
                         var currentFile = processedFiles + 1;
-                        ProgressText = $"処理中... ({currentFile}/{totalFiles}) {Path.GetFileName(fileItem.FilePath)}";
-                        fileItem.Status = "処理中...";
+                        ProgressText = $"{_languageService.GetString("Processing")} ({currentFile}/{totalFiles}) {Path.GetFileName(fileItem.FilePath)}";
+                        fileItem.Status = STATUS_PROCESSING;
                         
                         // 新しい設定システムを使用してファイル名を生成
                         var metadata = await Task.Run(() => _pdfProcessingService.ExtractMetadataFromPdf(fileItem.FilePath));
                         
-                        // 取得対象として設定されているメタデータがすべて空の場合は「メタデータなし」として処理
-                        var hasMetadata = false;
+
                         
-                        // 有効なメタデータ要素をチェック
-                        foreach (var element in _settings.Elements.Where(e => e.IsEnabled))
-                        {
-                            switch (element.ElementType)
-                            {
-                                case "Title":
-                                    if (!string.IsNullOrWhiteSpace(metadata.Title))
-                                    {
-                                        hasMetadata = true;
-                                        break;
-                                    }
-                                    break;
-                                case "Author":
-                                    if (!string.IsNullOrWhiteSpace(metadata.Author))
-                                    {
-                                        hasMetadata = true;
-                                        break;
-                                    }
-                                    break;
-                                case "Subject":
-                                    if (!string.IsNullOrWhiteSpace(metadata.Subject))
-                                    {
-                                        hasMetadata = true;
-                                        break;
-                                    }
-                                    break;
-                                case "Keywords":
-                                    if (!string.IsNullOrWhiteSpace(metadata.Keywords))
-                                    {
-                                        hasMetadata = true;
-                                        break;
-                                    }
-                                    break;
-                            }
-                            
-                            // メタデータが見つかったらループを抜ける
-                            if (hasMetadata) break;
-                        }
-                        
-                        if (!hasMetadata)
+                        // 設定に基づいてファイル名を生成（メタデータチェックも含む）
+                        var generatedFileName = _settings.GenerateFileName(
+                            fileItem.FileName,
+                            metadata.Title ?? string.Empty,
+                            metadata.Author ?? string.Empty,
+                            metadata.Subject ?? string.Empty,
+                            metadata.Keywords ?? string.Empty);
+
+                        if (string.IsNullOrWhiteSpace(generatedFileName))
                         {
                             skippedInProcessCount++;
-                            LogText += $"⊘ {fileItem.FileName}: メタデータなし\n";
-                            fileItem.Status = "メタデータなし";
-                            fileItem.ErrorDetails = "PDFファイルにメタデータ情報が設定されていません";
+                            LogText += $"⊘ {fileItem.FileName}: {_languageService.GetString("NoMetadata")}\n";
+                            fileItem.Status = STATUS_NO_METADATA;
+                            fileItem.ErrorDetails = _languageService.GetString("NoMetadataError");
                         }
                         else
                         {
-                            var generatedFileName = _settings.GenerateFileName(
-                                fileItem.FileName,
-                                metadata.Title,
-                                metadata.Author,
-                                metadata.Subject,
-                                metadata.Keywords);
+                            // ファイル名の各部分を個別にサニタイズ（NFKC正規化の制御付き）
+                            var sanitizedFileName = SanitizeFileNameWithNFKCControl(generatedFileName);
+                            var newFileName = $"{sanitizedFileName}.pdf";
+                            var newFilePath = Path.Combine(Path.GetDirectoryName(fileItem.FilePath)!, newFileName);
 
-                            if (string.IsNullOrWhiteSpace(generatedFileName))
+                            if (string.Equals(fileItem.FileName, newFileName, StringComparison.OrdinalIgnoreCase))
                             {
                                 skippedInProcessCount++;
-                                LogText += $"⊘ {fileItem.FileName}: タイトルなし\n";
-                                fileItem.Status = "タイトルなし";
-                                fileItem.ErrorDetails = "PDFファイルにメタデータ情報が設定されていません";
+                                LogText += $"⊘ {fileItem.FileName}: {_languageService.GetString("NoChangeNeeded")}\n";
+                                fileItem.Status = STATUS_NO_CHANGE_NEEDED;
+                                fileItem.ErrorDetails = _languageService.GetString("AlreadyProperlySet");
                             }
                             else
                             {
-                                // ファイル名の各部分を個別にサニタイズ（NFKC正規化の制御付き）
-                                var sanitizedFileName = SanitizeFileNameWithNFKCControl(generatedFileName);
-                                var newFileName = $"{sanitizedFileName}.pdf";
-                                var newFilePath = Path.Combine(Path.GetDirectoryName(fileItem.FilePath)!, newFileName);
-
-                                if (string.Equals(fileItem.FileName, newFileName, StringComparison.OrdinalIgnoreCase))
+                                try
                                 {
-                                    skippedInProcessCount++;
-                                    LogText += $"⊘ {fileItem.FileName}: 変更不要\n";
-                                    fileItem.Status = "変更不要";
-                                    fileItem.ErrorDetails = "ファイル名は既に適切に設定されています";
+                                    // 重複ファイル名の処理
+                                    var uniqueFilePath = _pdfProcessingService.GetUniqueFilePath(newFilePath);
+                                    var finalFileName = Path.GetFileName(uniqueFilePath);
+                                    
+                                    File.Move(fileItem.FilePath, uniqueFilePath);
+                                    
+                                    successCount++;
+                                    LogText += $"✓ {fileItem.FileName} → {finalFileName}\n";
+                                    
+                                    fileItem.NewFileName = finalFileName;
+                                    fileItem.Status = STATUS_RENAME_COMPLETE;
+                                    fileItem.ErrorDetails = "";
                                 }
-                                else
+                                catch (Exception ex)
                                 {
-                                    try
-                                    {
-                                        // 重複ファイル名の処理
-                                        var uniqueFilePath = _pdfProcessingService.GetUniqueFilePath(newFilePath);
-                                        var finalFileName = Path.GetFileName(uniqueFilePath);
-                                        
-                                        File.Move(fileItem.FilePath, uniqueFilePath);
-                                        
-                                        successCount++;
-                                        LogText += $"✓ {fileItem.FileName} → {finalFileName}\n";
-                                        
-                                        fileItem.NewFileName = finalFileName;
-                                        fileItem.Status = "リネーム完了";
-                                        fileItem.ErrorDetails = "";
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        errorCount++;
-                                        LogText += $"✗ {fileItem.FileName}: {ex.Message}\n";
-                                        fileItem.Status = "エラー";
-                                        fileItem.ErrorDetails = $"ファイル移動エラー: {ex.Message}";
-                                    }
+                                    errorCount++;
+                                    LogText += $"✗ {fileItem.FileName}: {ex.Message}\n";
+                                    fileItem.Status = STATUS_ERROR;
+                                    fileItem.ErrorDetails = $"{_languageService.GetString("FileMoveError")}: {ex.Message}";
                                 }
                             }
                         }
@@ -382,23 +423,23 @@ namespace PdfTitleRenamer.ViewModels
                         errorCount++;
                         LogText += $"✗ {Path.GetFileName(fileItem.FilePath)}: {ex.Message}\n";
                         
-                        fileItem.Status = "エラー";
-                        fileItem.ErrorDetails = $"処理中にエラーが発生しました: {ex.Message}";
+                        fileItem.Status = STATUS_ERROR;
+                        fileItem.ErrorDetails = $"{_languageService.GetString("ProcessingError")}: {ex.Message}";
                     }
 
                     processedFiles++;
                     ProgressValue = (double)processedFiles / totalFiles * 100;
                 }
 
-                LogText += $"\n処理完了: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n";
-                LogText += $"成功: {successCount}件, スキップ: {skippedInProcessCount}件, エラー: {errorCount}件\n";
+                LogText += $"\n{_languageService.GetString("ProcessingCompleteLog")}: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n";
+                LogText += $"{_languageService.GetString("SuccessCountLog")}: {successCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("SkippedCountLog")}: {skippedInProcessCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("ErrorCountLog")}: {errorCount}{_languageService.GetString("FilesUnit")}\n";
                 
-                ProgressText = $"処理完了 - 成功: {successCount}件, スキップ: {skippedInProcessCount}件, エラー: {errorCount}件";
+                ProgressText = $"{_languageService.GetString("ProcessingCompleteLog")} - {_languageService.GetString("SuccessCountLog")}: {successCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("SkippedCountLog")}: {skippedInProcessCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("ErrorCountLog")}: {errorCount}{_languageService.GetString("FilesUnit")}";
             }
             catch (Exception ex)
             {
-                LogText += $"\n処理エラー: {ex.Message}\n";
-                ProgressText = "処理エラーが発生しました";
+                LogText += $"\n{_languageService.GetString("ProcessingErrorLog")}: {ex.Message}\n";
+                ProgressText = _languageService.GetString("ProcessingErrorOccurred");
             }
             finally
             {
@@ -425,6 +466,7 @@ namespace PdfTitleRenamer.ViewModels
 
         private void ClearLog()
         {
+            _logService.ClearLog();
             LogText = "";
         }
 
@@ -438,7 +480,15 @@ namespace PdfTitleRenamer.ViewModels
             }
             catch (Exception ex)
             {
-                _logService.LogError($"AboutWindowの表示に失敗しました: {ex.Message}");
+                _logService.LogError($"{_languageService.GetString("AboutWindowDisplayError")}: {ex.Message}");
+            }
+        }
+
+        private void ChangeLanguage(string? languageCode)
+        {
+            if (!string.IsNullOrEmpty(languageCode))
+            {
+                _languageService.SetLanguage(languageCode);
             }
         }
 
@@ -446,36 +496,47 @@ namespace PdfTitleRenamer.ViewModels
         {
             try
             {
-                // 設定を再読み込みして最新の状態にする
+                // 設定ファイルから最新の設定を読み込む
                 var currentSettings = FileNameSettings.Load();
-                var settingsViewModel = new SettingsWindowViewModel(currentSettings, _logService);
+                var settingsViewModel = new SettingsWindowViewModel(currentSettings, _logService, _languageService);
                 var settingsWindow = new Views.SettingsWindow(settingsViewModel);
                 
-                // 設定ウィンドウをモーダルで表示
-                settingsWindow.Owner = Application.Current.MainWindow;
-                var result = settingsWindow.ShowDialog();
-                
-                if (result == true)
-                {
-                    // 設定が保存された場合、MainWindowViewModelの設定を更新
-                    _settings.CustomPrefix = currentSettings.CustomPrefix;
-                    _settings.CustomSuffix = currentSettings.CustomSuffix;
-                    _settings.Separator = currentSettings.Separator;
+                // 設定保存イベントを購読
+                settingsViewModel.SettingsSaved += (s, e) => {
+                    // 設定が保存された場合、設定ファイルから最新の設定を再読み込み
+                    var updatedSettings = FileNameSettings.Load();
+                    
+                    // MainWindowViewModelの設定を更新
+                    _settings.CustomPrefix = updatedSettings.CustomPrefix;
+                    _settings.CustomSuffix = updatedSettings.CustomSuffix;
+                    _settings.Separator = updatedSettings.Separator;
                     
                     // Elementsを更新
                     _settings.Elements.Clear();
-                    foreach (var element in currentSettings.Elements)
+                    foreach (var element in updatedSettings.Elements)
                     {
                         _settings.Elements.Add(new FileNameElement(element.ElementType, element.IsEnabled));
                     }
                     
-                    _logService.LogInfo("設定が更新されました。プレビューを更新します。");
+                    _logService.LogInfo(_languageService.GetString("SettingsUpdatedLog"));
                     UpdateAllFilePreviews();
-                }
+                    
+                    // コマンドの状態を更新
+                    (ProcessFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                };
+                
+                // ウィンドウを閉じるイベントを購読（キャンセル時用）
+                settingsViewModel.WindowClosed += (s, e) => {
+                    // キャンセル時は何もしない
+                };
+                
+                // 設定ウィンドウをモーダルで表示
+                settingsWindow.Owner = Application.Current.MainWindow;
+                settingsWindow.ShowDialog();
             }
             catch (Exception ex)
             {
-                _logService.LogError($"設定ウィンドウの表示に失敗しました: {ex.Message}");
+                _logService.LogError($"{_languageService.GetString("SettingsWindowError")}: {ex.Message}");
             }
         }
 
@@ -491,6 +552,8 @@ namespace PdfTitleRenamer.ViewModels
         {
             await UpdateAllFilePreviewsAsync();
         }
+
+        public ILanguageService GetLanguageService() => _languageService;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -510,6 +573,13 @@ namespace PdfTitleRenamer.ViewModels
         }
 
 
+
+        private bool HasValidMetadataSettings()
+        {
+            // PDFメタデータ項目（Title, Author, Subject, Keywords）のいずれかが有効かチェック
+            var metadataElements = new[] { "Title", "Author", "Subject", "Keywords" };
+            return _settings.Elements.Any(e => e.IsEnabled && metadataElements.Contains(e.ElementType));
+        }
 
         private string SanitizeFileNameWithNFKCControl(string fileName)
         {

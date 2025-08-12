@@ -11,21 +11,11 @@ namespace PdfTitleRenamer.Views
             InitializeComponent();
             DataContext = viewModel;
 
-            // イベントハンドラーの設定
-            viewModel.SettingsSaved += (s, e) => 
-            {
-                DialogResult = true;
-                Close();
-            };
-
-            viewModel.SettingsCancelled += (s, e) => 
-            {
-                DialogResult = false;
-                Close();
-            };
-
             // ドラッグ&ドロップイベントの設定
             Loaded += SettingsWindow_Loaded;
+
+            // ウィンドウを閉じるイベントを購読
+            viewModel.WindowClosed += (s, e) => Close();
         }
 
         private void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
@@ -43,7 +33,7 @@ namespace PdfTitleRenamer.Views
                 var viewModel = DataContext as SettingsWindowViewModel;
                 if (viewModel != null)
                 {
-                    viewModel.UpdatePreviewPublic();
+                    viewModel.UpdatePreview();
                 }
             }
         }
@@ -56,7 +46,7 @@ namespace PdfTitleRenamer.Views
                 var viewModel = DataContext as SettingsWindowViewModel;
                 if (viewModel != null)
                 {
-                    viewModel.UpdatePreviewPublic();
+                    viewModel.UpdatePreview();
                 }
             }
         }

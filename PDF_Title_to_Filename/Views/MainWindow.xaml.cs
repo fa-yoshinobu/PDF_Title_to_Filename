@@ -1,4 +1,5 @@
 using PdfTitleRenamer.ViewModels;
+using PdfTitleRenamer.Services;
 using System.Windows;
 using System.Linq;
 using System;
@@ -9,11 +10,13 @@ namespace PdfTitleRenamer.Views
     public partial class MainWindow : Window
     {
         private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext;
+        private ILanguageService? _languageService;
 
         public MainWindow(MainWindowViewModel viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;
+            _languageService = viewModel.GetLanguageService();
             
             // ファイル数の変化に応じてVisibilityを制御
             viewModel.PropertyChanged += (s, e) => {
@@ -67,7 +70,9 @@ namespace PdfTitleRenamer.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"ドラッグ&ドロップエラー: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"{_languageService?.GetString("DragDropError")}: {ex.Message}", 
+                              _languageService?.GetString("ErrorTitle") ?? "Error", 
+                              MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
