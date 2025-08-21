@@ -9,11 +9,11 @@ namespace PdfTitleRenamer.Helpers
             try
             {
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
-                return version?.ToString() ?? "1.0.3";
+                return version?.ToString() ?? "1.0.4";
             }
             catch
             {
-                return "1.0.3";
+                return "1.0.4";
             }
         }
 
@@ -23,11 +23,11 @@ namespace PdfTitleRenamer.Helpers
             {
                 var assembly = Assembly.GetExecutingAssembly();
                 var fileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-                return fileVersionInfo.FileVersion ?? "1.0.3";
+                return fileVersionInfo.FileVersion ?? "1.0.4";
             }
             catch
             {
-                return "1.0.3";
+                return "1.0.4";
             }
         }
     }

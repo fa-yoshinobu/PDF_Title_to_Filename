@@ -12,6 +12,7 @@ namespace PdfTitleRenamer.Models
         private string _customSuffix = "";
         private string _separator = " - ";
         private ObservableCollection<FileNameElement> _elements = new();
+        private string _currentLanguage = "en";
 
         public string CustomPrefix
         {
@@ -39,28 +40,18 @@ namespace PdfTitleRenamer.Models
             set => SetProperty(ref _elements, value);
         }
 
+        public string CurrentLanguage
+        {
+            get => _currentLanguage;
+            set => SetProperty(ref _currentLanguage, value);
+        }
+
 
 
         // 設定ファイルパスを取得
         public static string GetSettingsFilePath()
         {
-            // Windows標準のアプリケーション設定保存場所を使用
-            var localAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            if (!string.IsNullOrEmpty(localAppDataPath))
-            {
-                var appFolder = Path.Combine(localAppDataPath, "PDF_Title_to_Filename");
-                return Path.Combine(appFolder, "settings.json");
-            }
-            
-            // フォールバック: ユーザーのドキュメントフォルダ
-            var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            if (!string.IsNullOrEmpty(documentsPath))
-            {
-                var appFolder = Path.Combine(documentsPath, "PDF_Title_to_Filename");
-                return Path.Combine(appFolder, "settings.json");
-            }
-            
-            // 最終フォールバック: 実行ファイルと同じディレクトリ
+            // 優先: 実行ファイルと同じディレクトリ
             string? exeDirectory = null;
             
             try
@@ -87,7 +78,30 @@ namespace PdfTitleRenamer.Models
                 exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
             }
             
-            return Path.Combine(exeDirectory, "PDF_Title_to_Filename.json");
+            if (!string.IsNullOrEmpty(exeDirectory))
+            {
+                return Path.Combine(exeDirectory, "PDF_Title_to_Filename.json");
+            }
+            
+            // フォールバック1: Windows標準のアプリケーション設定保存場所
+            var localAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (!string.IsNullOrEmpty(localAppDataPath))
+            {
+                var appFolder = Path.Combine(localAppDataPath, "PDF_Title_to_Filename");
+                return Path.Combine(appFolder, "PDF_Title_to_Filename.json");
+            }
+            
+            // フォールバック2: ユーザーのドキュメントフォルダ
+            var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (!string.IsNullOrEmpty(documentsPath))
+            {
+                var appFolder = Path.Combine(documentsPath, "PDF_Title_to_Filename");
+                return Path.Combine(appFolder, "PDF_Title_to_Filename.json");
+            }
+            
+            // 最終フォールバック: 一時ディレクトリ
+            var tempPath = Path.GetTempPath();
+            return Path.Combine(tempPath, "PDF_Title_to_Filename_settings.json");
         }
 
         // デフォルト設定
@@ -96,7 +110,8 @@ namespace PdfTitleRenamer.Models
             CustomPrefix = "",
             CustomSuffix = "",
             Separator = " - ",
-            Elements = CreateDefaultElements()
+            Elements = CreateDefaultElements(),
+            CurrentLanguage = "en"
         };
 
         // デフォルト要素の作成

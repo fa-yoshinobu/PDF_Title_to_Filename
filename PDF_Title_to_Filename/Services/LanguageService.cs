@@ -8,18 +8,18 @@ namespace PdfTitleRenamer.Services
     public class LanguageService : ILanguageService
     {
         private readonly ResourceManager _resourceManager;
-        private readonly LanguageSettings _languageSettings;
+        private readonly FileNameSettings _settings;
         private CultureInfo _currentCulture;
 
         public event EventHandler? LanguageChanged;
 
-        public string CurrentLanguage => _languageSettings.CurrentLanguage;
+        public string CurrentLanguage => _settings.CurrentLanguage;
 
         public LanguageService()
         {
             _resourceManager = new ResourceManager("PdfTitleRenamer.Resources.Strings", typeof(LanguageService).Assembly);
-            _languageSettings = LanguageSettings.Load();
-            _currentCulture = new CultureInfo(_languageSettings.CurrentLanguage);
+            _settings = FileNameSettings.Load();
+            _currentCulture = new CultureInfo(_settings.CurrentLanguage);
         }
 
         public string GetString(string key)
@@ -330,11 +330,11 @@ namespace PdfTitleRenamer.Services
 
         public void SetLanguage(string languageCode)
         {
-            if (_languageSettings.CurrentLanguage != languageCode)
+            if (_settings.CurrentLanguage != languageCode)
             {
-                _languageSettings.CurrentLanguage = languageCode;
+                _settings.CurrentLanguage = languageCode;
                 _currentCulture = new CultureInfo(languageCode);
-                _languageSettings.Save();
+                _settings.Save();
                 LanguageChanged?.Invoke(this, EventArgs.Empty);
             }
         }

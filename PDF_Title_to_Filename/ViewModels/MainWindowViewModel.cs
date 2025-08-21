@@ -510,6 +510,7 @@ namespace PdfTitleRenamer.ViewModels
                     _settings.CustomPrefix = updatedSettings.CustomPrefix;
                     _settings.CustomSuffix = updatedSettings.CustomSuffix;
                     _settings.Separator = updatedSettings.Separator;
+                    _settings.CurrentLanguage = updatedSettings.CurrentLanguage;
                     
                     // Elementsを更新
                     _settings.Elements.Clear();

@@ -33,7 +33,7 @@
                            Foreground="#1F2937"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,5"/>
-                <TextBlock x:Name="VersionTextBlock" Text="Version 1.0.3"
+                <TextBlock x:Name="VersionTextBlock" Text="Version 1.0.4"
                            FontSize="16"
                            Foreground="#6B7280"
                            HorizontalAlignment="Center"
@@ -96,7 +96,7 @@
                                         </Grid.RowDefinitions>
                                         
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding VersionLabel}" FontWeight="Medium" Foreground="#374151"/>
-                                        <TextBlock x:Name="VersionDetailTextBlock" Grid.Row="0" Grid.Column="1" Text="1.0.3" Foreground="#6B7280"/>
+                                        <TextBlock x:Name="VersionDetailTextBlock" Grid.Row="0" Grid.Column="1" Text="1.0.4" Foreground="#6B7280"/>
                                         
                                         <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding AuthorLabel}" FontWeight="Medium" Foreground="#374151"/>
                                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding AuthorValue}" Foreground="#6B7280"/>

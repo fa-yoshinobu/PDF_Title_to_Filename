@@ -4,36 +4,36 @@
 ![WPF](https://img.shields.io/badge/WPF-Windows-blue.svg)
 ![Single File](https://img.shields.io/badge/Distribution-Single%20File-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version](https://img.shields.io/badge/Version-1.0.3-blue.svg)
+![Version](https://img.shields.io/badge/Version-1.0.4-blue.svg)
 ![Languages](https://img.shields.io/badge/Languages-Japanese%20%7C%20English-orange.svg)
 
 **[English](#pdf-title-to-filename) | [日本語](#pdf-title-to-filename-1)**
 
 ---
 
-A fast and lightweight Windows application that extracts titles from PDF metadata and automatically sets them as filenames.
+A fast and lightweight Windows application that extracts titles from PDF metadata and automatically sets them as filenames. Perfect for organizing large collections of PDF documents with meaningful, searchable filenames.
 
 ![PDF Title to Filename_en](image1.png)
 
-**Ver.1.0.3** - Multi-language support and metadata processing logic improvements
+**Ver.1.0.4** - Enhanced multi-language support and improved metadata processing logic
 
 ## ✨ Features
 
-- **🚀 Fast Processing** - Improved processing speed through extensive code optimization
-- **📦 Single Executable** - No .NET Runtime required, complete in one file
-- **🌐 Multi-language Support** - Complete Japanese and English support
-- **📁 Drag & Drop Support** - Easily drag PDF files for batch processing
-- **📊 Table Display** - Easy-to-view display of filenames, new names, and status
-- **⚡ Lightweight Design** - Removed unnecessary code with minimal dependencies
-- **🔄 Asynchronous Processing** - Fast processing without blocking the UI
-- **🎨 Modern UI** - Beautiful Material Design-inspired interface
-- **🔍 Recursive Folder Search** - Automatically searches subfolders when dropping folders
-- **⚙️ Advanced Settings** - Detailed customization of filename generation
-- **🔤 NFKC Normalization Control** - Item-specific control of full-width to half-width conversion
-- **📋 No Metadata Support** - Flexible processing based on settings
-- **🛡️ Robust Error Handling** - Comprehensive exception handling and recovery
-- **🔒 Settings Validation** - Prevention of invalid PDF metadata item settings
-- **📝 Conditional Logging** - Detailed log control through debug/release builds
+- **🚀 Fast Processing** - Optimized performance through extensive code refinement
+- **📦 Single Executable** - Self-contained application with no .NET Runtime dependency
+- **🌐 Multi-language Support** - Seamless Japanese and English interface
+- **📁 Drag & Drop Support** - Intuitive batch processing with simple file dragging
+- **📊 Table Display** - Clear overview of current names, new names, and processing status
+- **⚡ Lightweight Design** - Minimal footprint with optimized dependencies
+- **🔄 Asynchronous Processing** - Non-blocking UI with background processing
+- **🎨 Modern UI** - Elegant Material Design-inspired interface
+- **🔍 Recursive Folder Search** - Automatic subfolder scanning when dropping directories
+- **⚙️ Advanced Settings** - Granular control over filename generation parameters
+- **🔤 NFKC Normalization Control** - Precise control over character width conversion
+- **📋 No Metadata Support** - Intelligent handling of files without metadata
+- **🛡️ Robust Error Handling** - Comprehensive error recovery and user feedback
+- **🔒 Settings Validation** - Smart prevention of invalid configuration settings
+- **📝 Conditional Logging** - Adaptive logging based on build configuration
 
 ## 🎯 Performance Optimization
 
@@ -203,16 +203,16 @@ dotnet publish --configuration Release
 
 ### Basic Operations
 1. **Launch Application**: Run `PDF_Title_to_Filename.exe` (No .NET Runtime required)
-2. **Language Switch**: Switch between Japanese and English with 🌐 button
-3. **Settings Customization**: Detailed filename generation settings with ⚙️ button
+2. **Language Switch**: Toggle between Japanese and English using the 🌐 button
+3. **Settings Customization**: Configure detailed filename generation settings via the ⚙️ button
 4. **Add Files**: 
-   - Drag and drop PDF files to the table area
-   - Or click the "Select Files" button
-   - Drop a folder to automatically search for PDF files within the folder
-5. **Preview Confirmation**: Check expected filenames in the table
-6. **Execute Processing**: Click the "Start Processing" button
-7. **Check Results**: Confirm processing results in the status column and log area
-8. **App Information**: Display app information and open source licenses with "?" button
+   - Drag and drop PDF files directly into the table area
+   - Use the "Select Files" button for traditional file selection
+   - Drop entire folders to automatically scan for all PDF files within
+5. **Preview Confirmation**: Review expected filenames in the preview table
+6. **Execute Processing**: Click the "Start Processing" button to begin
+7. **Check Results**: Monitor processing results in the status column and log area
+8. **App Information**: Access app information and open source licenses via the "?" button
 
 ### Language Switching Features
 - **Automatic Language Selection**: Automatic selection based on system language
@@ -224,29 +224,27 @@ dotnet publish --configuration Release
 #### Settings File Storage Location
 Application settings are saved in the following priority order:
 
-1. **AppData/Local** (Recommended/Default)
-   - Location: `%LOCALAPPDATA%\PDF_Title_to_Filename\settings.json`
-   - Example: `C:\Users\Username\AppData\Local\PDF_Title_to_Filename\settings.json`
+1. **Same Folder as Executable** (Recommended/Default)
+   - Location: `PDF_Title_to_Filename.json`
+   - Settings stored alongside the application
+   - Portable configuration
+   - Settings move with the application
+
+2. **AppData/Local** (Fallback 1)
+   - Location: `%LOCALAPPDATA%\PDF_Title_to_Filename\PDF_Title_to_Filename.json`
    - Windows standard application settings storage location
    - Independent settings per user
-   - Settings are maintained even when the application is moved
-   - Appropriate location dedicated to settings files
+   - Used when executable directory is not writable
 
-2. **User Documents Folder** (Fallback)
-   - When AppData/Local is not accessible
-   - Location: `%USERPROFILE%\Documents\PDF_Title_to_Filename\settings.json`
-   - Suitable for single executable distribution
+3. **User Documents Folder** (Fallback 2)
+   - Location: `%USERPROFILE%\Documents\PDF_Title_to_Filename\PDF_Title_to_Filename.json`
+   - Alternative location when other locations are not accessible
 
-3. **Same Folder as Executable** (Final Fallback)
-   - Location: `PDF_Title_to_Filename.json`
-   - Used only when other methods fail
-   - Saved in the same directory as the executable
-
-**Note**: In the current implementation, settings files are not saved in the same folder as the executable. They are saved in Windows standard AppData/Local, so settings are maintained even when the application is moved.
+**Note**: Settings are now primarily saved in the same folder as the executable for better portability and easier management.
 
 **How to Check Settings File Location**:
 - Open `%LOCALAPPDATA%\PDF_Title_to_Filename\` folder in Windows Explorer
-- Run `Get-ChildItem "$env:LOCALAPPDATA\PDF_Title_to_Filename\settings.json"` in PowerShell
+- Run `Get-ChildItem "$env:LOCALAPPDATA\PDF_Title_to_Filename\PDF_Title_to_Filename.json"` in PowerShell
 - If the settings file doesn't exist, it will be automatically created when you change and save settings in the application
 
 #### Filename Element Settings
@@ -490,13 +488,13 @@ Contributions to the project are welcome!
 5. Create a Pull Request
 
 ### Development Guidelines
-- Utilize the latest features of C# 12.0
-- Follow MVVM pattern design
-- Proper implementation of asynchronous processing
-- Thorough error handling
-- Performance-considered implementation
-- Create unit tests
-- Consider localization support
+- Leverage the latest C# 12.0 features for optimal performance
+- Maintain strict MVVM pattern adherence
+- Implement proper asynchronous processing patterns
+- Ensure comprehensive error handling throughout
+- Prioritize performance optimization in all implementations
+- Include comprehensive unit test coverage
+- Maintain localization support for all new features
 
 ## 📞 Support
 
@@ -510,36 +508,36 @@ If you have any issues or questions, please let us know on the GitHub Issues pag
 ![WPF](https://img.shields.io/badge/WPF-Windows-blue.svg)
 ![Single File](https://img.shields.io/badge/Distribution-Single%20File-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version](https://img.shields.io/badge/Version-1.0.3-blue.svg)
+![Version](https://img.shields.io/badge/Version-1.0.4-blue.svg)
 ![Languages](https://img.shields.io/badge/Languages-Japanese%20%7C%20English-orange.svg)
 
 **[English](#pdf-title-to-filename) | [日本語](#pdf-title-to-filename-1)**
 
 ---
 
-PDFファイルのメタデータからタイトルを抽出し、自動的にファイル名として設定する高速で軽量なWindowsアプリケーションです。
+PDFファイルのメタデータからタイトルを抽出し、自動的にファイル名として設定する高速で軽量なWindowsアプリケーションです。大量のPDF文書を意味のある検索可能なファイル名で整理するのに最適です。
 
 ![PDF Title to Filename_jp](image2.png)
 
-**Ver.1.0.3** - マルチランゲージ対応とメタデータ処理ロジックの改善
+**Ver.1.0.4** - マルチランゲージ対応の強化とメタデータ処理ロジックの改善
 
 ## ✨ 主な機能
 
 - **🚀 高速処理** - 広範なコード最適化による処理速度の向上
 - **📦 単一実行ファイル** - .NET Runtime不要、1つのファイルで完結
-- **🌐 マルチランゲージ対応** - 日本語・英語の完全対応
-- **📁 ドラッグ&ドロップ対応** - PDFファイルを簡単にドラッグしてバッチ処理
-- **📊 表形式表示** - ファイル名、新しい名前、ステータスを見やすく表示
-- **⚡ 軽量設計** - 不要なコードを削除し、最小限の依存関係
-- **🔄 非同期処理** - UIをブロックしない高速処理
-- **🎨 モダンUI** - 美しいMaterial Design風インターフェース
+- **🌐 マルチランゲージ対応** - 日本語・英語のシームレスな対応
+- **📁 ドラッグ&ドロップ対応** - 直感的なバッチ処理でPDFファイルを簡単にドラッグ
+- **📊 表形式表示** - 現在の名前、新しい名前、処理ステータスを分かりやすく表示
+- **⚡ 軽量設計** - 不要なコードを削除し、最適化された依存関係
+- **🔄 非同期処理** - UIをブロックしないバックグラウンド処理
+- **🎨 モダンUI** - 洗練されたMaterial Design風インターフェース
 - **🔍 フォルダ再帰検索** - フォルダをドロップするとサブフォルダも自動検索
-- **⚙️ 高度な設定** - ファイル名生成の詳細カスタマイズ
-- **🔤 NFKC正規化制御** - 項目別の全角→半角変換制御
-- **📋 メタデータなし対応** - 設定に基づく柔軟な処理
-- **🛡️ 堅牢なエラーハンドリング** - 包括的な例外処理と復旧
-- **🔒 設定妥当性チェック** - 無効なPDFメタデータ項目設定の防止
-- **📝 条件付きログ出力** - デバッグ/リリースビルドによる詳細ログ制御
+- **⚙️ 高度な設定** - ファイル名生成パラメータの細かい制御
+- **🔤 NFKC正規化制御** - 文字幅変換の精密な制御
+- **📋 メタデータなし対応** - メタデータがないファイルの賢い処理
+- **🛡️ 堅牢なエラーハンドリング** - 包括的なエラー復旧とユーザーフィードバック
+- **🔒 設定妥当性チェック** - 無効な設定のスマートな防止
+- **📝 条件付きログ出力** - ビルド設定に応じた適応的ログ出力
 
 ## 🎯 パフォーマンス最適化
 
@@ -678,13 +676,13 @@ dotnet publish --configuration Release
 2. **言語切り替え**: 🌐ボタンで日本語・英語を切り替え
 3. **設定カスタマイズ**: ⚙️ボタンでファイル名生成の詳細設定
 4. **ファイル追加**: 
-   - PDFファイルをテーブルエリアにドラッグ&ドロップ
-   - または「ファイル選択」ボタンをクリック
-   - フォルダをドロップするとフォルダ内のPDFファイルを自動検索
-5. **プレビュー確認**: テーブルで予想されるファイル名を確認
-6. **処理実行**: 「処理開始」ボタンをクリック
-7. **結果確認**: ステータス列とログエリアで処理結果を確認
-8. **アプリ情報**: 「?」ボタンでアプリ情報とオープンソースライセンスを表示
+   - PDFファイルをテーブルエリアに直接ドラッグ&ドロップ
+   - 「ファイル選択」ボタンで従来のファイル選択
+   - フォルダをドロップするとフォルダ内の全PDFファイルを自動スキャン
+5. **プレビュー確認**: プレビューテーブルで予想されるファイル名を確認
+6. **処理実行**: 「処理開始」ボタンをクリックして開始
+7. **結果確認**: ステータス列とログエリアで処理結果を監視
+8. **アプリ情報**: 「?」ボタンでアプリ情報とオープンソースライセンスにアクセス
 
 ### 言語切り替え機能
 - **自動言語選択**: システム言語に基づく自動選択
@@ -696,29 +694,27 @@ dotnet publish --configuration Release
 #### 設定ファイルの保存場所
 アプリケーション設定は以下の優先順位で保存されます：
 
-1. **AppData/Local** (推奨/デフォルト)
-   - 場所: `%LOCALAPPDATA%\PDF_Title_to_Filename\settings.json`
-   - 例: `C:\Users\ユーザー名\AppData\Local\PDF_Title_to_Filename\settings.json`
+1. **実行ファイルと同じフォルダ** (推奨/デフォルト)
+   - 場所: `PDF_Title_to_Filename.json`
+   - アプリケーションと同じ場所に設定を保存
+   - ポータブル設定
+   - アプリケーションと一緒に設定が移動
+
+2. **AppData/Local** (フォールバック1)
+   - 場所: `%LOCALAPPDATA%\PDF_Title_to_Filename\PDF_Title_to_Filename.json`
    - Windows標準のアプリケーション設定保存場所
    - ユーザー別の独立した設定
-   - アプリケーションを移動しても設定は維持
-   - 設定ファイル専用の適切な場所
+   - 実行ファイルディレクトリが書き込み不可の場合に使用
 
-2. **ユーザードキュメントフォルダ** (フォールバック)
-   - AppData/Localにアクセスできない場合
-   - 場所: `%USERPROFILE%\Documents\PDF_Title_to_Filename\settings.json`
-   - 単一実行ファイル配布に適している
+3. **ユーザードキュメントフォルダ** (フォールバック2)
+   - 場所: `%USERPROFILE%\Documents\PDF_Title_to_Filename\PDF_Title_to_Filename.json`
+   - 他の場所にアクセスできない場合の代替場所
 
-3. **実行ファイルと同じフォルダ** (最終フォールバック)
-   - 場所: `PDF_Title_to_Filename.json`
-   - 他の方法が失敗した場合のみ使用
-   - 実行ファイルと同じディレクトリに保存
-
-**注意**: 現在の実装では、設定ファイルは実行ファイルと同じフォルダには保存されません。Windows標準のAppData/Localに保存されるため、アプリケーションを移動しても設定は維持されます。
+**注意**: 設定は現在、主に実行ファイルと同じフォルダに保存され、ポータビリティと管理のしやすさが向上しています。
 
 **設定ファイルの場所を確認する方法**:
 - Windowsエクスプローラーで`%LOCALAPPDATA%\PDF_Title_to_Filename\`フォルダを開く
-- PowerShellで`Get-ChildItem "$env:LOCALAPPDATA\PDF_Title_to_Filename\settings.json"`を実行
+- PowerShellで`Get-ChildItem "$env:LOCALAPPDATA\PDF_Title_to_Filename\PDF_Title_to_Filename.json"`を実行
 - 設定ファイルが存在しない場合、アプリケーションで設定を変更・保存すると自動的に作成されます
 
 #### ファイル名要素設定
@@ -962,13 +958,13 @@ SOFTWARE.
 5. プルリクエストを作成
 
 ### 開発ガイドライン
-- C# 12.0の最新機能を活用
-- MVVMパターン設計に従う
-- 非同期処理の適切な実装
-- 徹底したエラーハンドリング
-- パフォーマンスを考慮した実装
-- 単体テストの作成
-- ローカライゼーション対応を考慮
+- 最適なパフォーマンスのためC# 12.0の最新機能を活用
+- 厳格なMVVMパターンの遵守を維持
+- 適切な非同期処理パターンの実装
+- 全体を通じて包括的なエラーハンドリングを確保
+- すべての実装でパフォーマンス最適化を優先
+- 包括的な単体テストカバレッジを含める
+- 新機能すべてでローカライゼーション対応を維持
 
 ## 📞 サポート
 
@@ -976,7 +972,7 @@ SOFTWARE.
 
 ## 🔄 更新履歴
 
-### Ver1.0.3 (2025-08-13)
+### Ver1.0.4 (2025-08-13)
 - **マルチランゲージ対応**
   - 日本語/英語の完全対応
   - 言語切り替えボタンの実装

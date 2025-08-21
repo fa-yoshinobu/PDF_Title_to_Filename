@@ -4,60 +4,60 @@ echo PDF Title to Filename - Debug Build
 echo ========================================
 echo.
 
-echo [1/4] 依存関係の復元...
+echo [1/4] Restoring dependencies...
 dotnet restore PDF_Title_to_Filename\PDF_Title_to_Filename.csproj
 if %ERRORLEVEL% neq 0 (
-    echo エラー: 依存関係の復元に失敗しました
+    echo Error: Failed to restore dependencies
     pause
     exit /b 1
 )
-echo ✓ 依存関係の復元完了
+echo Dependencies restored successfully
 echo.
 
-echo [2/4] Debugビルドの実行...
-echo 詳細ログが有効なDebugビルドを実行します
+echo [2/4] Executing Debug build...
+echo Executing Debug build with detailed logging enabled
 dotnet build PDF_Title_to_Filename\PDF_Title_to_Filename.csproj --configuration Debug --verbosity minimal
 if %ERRORLEVEL% neq 0 (
-    echo エラー: Debugビルドに失敗しました
+    echo Error: Debug build failed
     pause
     exit /b 1
 )
-echo ✓ Debugビルド完了
+echo Debug build completed
 echo.
 
-echo [3/4] 実行ファイルの確認...
+echo [3/4] Verifying executable file...
 if exist "PDF_Title_to_Filename\bin\Debug\net8.0-windows\win-x64\PDF_Title_to_Filename.exe" (
-    echo ✓ 実行ファイルが生成されました
-    echo 場所: PDF_Title_to_Filename\bin\Debug\net8.0-windows\win-x64\PDF_Title_to_Filename.exe
+    echo Executable file generated
+    echo Location: PDF_Title_to_Filename\bin\Debug\net8.0-windows\win-x64\PDF_Title_to_Filename.exe
 ) else (
-    echo 警告: 実行ファイルが見つかりません
+    echo Warning: Executable file not found
 )
 echo.
 
-echo [4/4] ビルド情報の表示...
+echo [4/4] Displaying build information...
 echo.
 echo ========================================
-echo ビルド情報
+echo Build Information
 echo ========================================
-echo ビルド設定: Debug
-echo 詳細ログ: 有効 (ENABLE_DETAILED_LOGGING)
-echo ターゲット: net8.0-windows
-echo プラットフォーム: win-x64
-echo 最適化: 無効 (デバッグ用)
-echo デバッグシンボル: 有効
+echo Build Configuration: Debug
+echo Detailed Logging: Enabled (ENABLE_DETAILED_LOGGING)
+echo Target: net8.0-windows
+echo Platform: win-x64
+echo Optimization: Disabled (for debugging)
+echo Debug Symbols: Enabled
 echo.
 
 echo ========================================
-echo Debugビルド完了！
+echo Debug build completed!
 echo ========================================
 echo.
-echo 使用方法:
-echo 1. PDF_Title_to_Filename\bin\Debug\net8.0-windows\win-x64\PDF_Title_to_Filename.exe を実行
-echo 2. 詳細なログがログエリアに表示されます
-echo 3. 問題の特定やデバッグが容易になります
+echo Usage:
+echo 1. Run PDF_Title_to_Filename\bin\Debug\net8.0-windows\win-x64\PDF_Title_to_Filename.exe
+echo 2. Detailed logs will be displayed in the log area
+echo 3. Easy to identify issues and debug
 echo.
-echo 注意: このビルドは本番配布用ではありません
-echo 本番配布には build.bat を使用してください
+echo Note: This build is not for production distribution
+echo Use build.bat for production distribution
 echo.
 
 pause
