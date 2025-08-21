@@ -15,8 +15,6 @@ A fast and lightweight Windows application that extracts titles from PDF metadat
 
 ![PDF Title to Filename_en](image1.png)
 
-**Ver.1.0.4** - Enhanced multi-language support and improved metadata processing logic
-
 ## ✨ Features
 
 - **🚀 Fast Processing** - Optimized performance through extensive code refinement
@@ -519,8 +517,6 @@ PDFファイルのメタデータからタイトルを抽出し、自動的に�
 
 ![PDF Title to Filename_jp](image2.png)
 
-**Ver.1.0.4** - マルチランゲージ対応の強化とメタデータ処理ロジックの改善
-
 ## ✨ 主な機能
 
 - **🚀 高速処理** - 広範なコード最適化による処理速度の向上
@@ -972,7 +968,13 @@ SOFTWARE.
 
 ## 🔄 更新履歴
 
-### Ver1.0.4 (2025-08-13)
+### Ver1.0.4 (2025-01-27)
+- **設定ファイルの保存場所変更**
+  - 実行ファイルと同じフォルダに設定ファイルを生成します
+- **ビルドスクリプトの改善**
+  - `build.bat`と`build-debug.bat`の両方を更新
+
+### Ver1.0.3 (2025-08-13)
 - **マルチランゲージ対応**
   - 日本語/英語の完全対応
   - 言語切り替えボタンの実装
