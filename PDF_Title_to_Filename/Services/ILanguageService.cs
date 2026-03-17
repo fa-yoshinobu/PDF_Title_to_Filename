@@ -1,6 +1,6 @@
 namespace PdfTitleRenamer.Services
 {
-    public interface ILanguageService
+    internal interface ILanguageService
     {
         string GetString(string key);
         void SetLanguage(string languageCode);

@@ -5,7 +5,7 @@ using PdfTitleRenamer.Services;
 
 namespace PdfTitleRenamer.Models
 {
-    public class FileNameElement : INotifyPropertyChanged
+    internal class FileNameElement : INotifyPropertyChanged
     {
         private bool _isEnabled;
         private string _elementType = string.Empty;

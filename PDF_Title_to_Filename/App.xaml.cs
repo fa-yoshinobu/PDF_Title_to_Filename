@@ -60,7 +60,7 @@ namespace PdfTitleRenamer
             }
         }
 
-        private void ConfigureServices(IServiceCollection services)
+        private static void ConfigureServices(IServiceCollection services)
         {
             // Logging (Microsoft.Extensions.Logging) - 本番環境では最小限
             services.AddLogging(builder =>

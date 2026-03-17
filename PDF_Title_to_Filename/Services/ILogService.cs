@@ -1,6 +1,6 @@
 namespace PdfTitleRenamer.Services
 {
-    public interface ILogService
+    internal interface ILogService
     {
         void LogMessage(string message);
         void LogError(string message, Exception? exception = null);

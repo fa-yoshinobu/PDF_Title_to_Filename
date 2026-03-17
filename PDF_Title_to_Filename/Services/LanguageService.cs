@@ -5,7 +5,7 @@ using PdfTitleRenamer.Models;
 
 namespace PdfTitleRenamer.Services
 {
-    public class LanguageService : ILanguageService
+    internal class LanguageService : ILanguageService
     {
         private readonly ResourceManager _resourceManager;
         private readonly FileNameSettings _settings;
@@ -36,7 +36,7 @@ namespace PdfTitleRenamer.Services
             }
         }
 
-        private string? GetLocalizedString(string key, string culture)
+        private static string? GetLocalizedString(string key, string culture)
         {
             return culture switch
             {
@@ -46,7 +46,7 @@ namespace PdfTitleRenamer.Services
             };
         }
 
-        private string? GetJapaneseString(string key)
+        private static string? GetJapaneseString(string key)
         {
             return key switch
             {
@@ -187,7 +187,7 @@ namespace PdfTitleRenamer.Services
             };
         }
 
-        private string? GetEnglishString(string key)
+        private static string? GetEnglishString(string key)
         {
             return key switch
             {

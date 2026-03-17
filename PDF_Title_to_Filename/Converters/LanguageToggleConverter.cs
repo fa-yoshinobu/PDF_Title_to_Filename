@@ -5,7 +5,7 @@ using System.IO;
 
 namespace PdfTitleRenamer.Converters
 {
-    public class LanguageToggleConverter : IValueConverter
+    internal class LanguageToggleConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

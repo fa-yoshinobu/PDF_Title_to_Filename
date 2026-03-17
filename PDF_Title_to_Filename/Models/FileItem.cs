@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace PdfTitleRenamer.Models
 {
-    public class FileItem : INotifyPropertyChanged
+    internal class FileItem : INotifyPropertyChanged
     {
         private string _newFileName;
         private string _status;

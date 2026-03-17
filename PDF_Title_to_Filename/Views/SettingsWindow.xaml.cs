@@ -4,7 +4,7 @@ using PdfTitleRenamer.ViewModels;
 
 namespace PdfTitleRenamer.Views
 {
-    public partial class SettingsWindow : Window
+    internal partial class SettingsWindow : Window
     {
         public SettingsWindow(SettingsWindowViewModel viewModel)
         {

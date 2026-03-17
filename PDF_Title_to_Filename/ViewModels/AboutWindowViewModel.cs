@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace PdfTitleRenamer.ViewModels
 {
-    public class AboutWindowViewModel : INotifyPropertyChanged
+    internal class AboutWindowViewModel : INotifyPropertyChanged
     {
         private readonly ILanguageService _languageService;
 
@@ -49,9 +49,9 @@ namespace PdfTitleRenamer.ViewModels
                                          public string Usage4 => _languageService.GetString("Usage4");
                      
                      // Value properties for AboutWindow
-                     public string VersionValue => "1.0.4";
-                     public string AuthorValue => "fa-yoshinobu";
-                     public string LinkValue => "https://github.com/fa-yoshinobu/PDF_Title_to_Filename";
+                     public static string VersionValue => "1.0.4";
+                     public static string AuthorValue => "fa-yoshinobu";
+                     public static string LinkValue => "https://github.com/fa-yoshinobu/PDF_Title_to_Filename";
                      public string DevelopmentLanguageValue => _languageService.GetString("DevelopmentLanguageValue");
                      public string UIFrameworkValue => _languageService.GetString("UIFrameworkValue");
                      public string DesignValue => _languageService.GetString("DesignValue");

@@ -10,7 +10,7 @@ namespace PdfTitleRenamer.Views
     /// <summary>
     /// AboutWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class AboutWindow : Window
+    internal partial class AboutWindow : Window
     {
         private readonly ILanguageService _languageService;
 

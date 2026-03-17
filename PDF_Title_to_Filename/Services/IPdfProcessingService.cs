@@ -2,7 +2,7 @@ using PdfTitleRenamer.Models;
 
 namespace PdfTitleRenamer.Services
 {
-    public interface IPdfProcessingService
+    internal interface IPdfProcessingService
     {
         PdfMetadata ExtractMetadataFromPdf(string filePath);
         string SanitizeFileName(string fileName, bool applyNFKC = true);

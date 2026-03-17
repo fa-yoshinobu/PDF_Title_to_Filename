@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace PdfTitleRenamer.ViewModels
 {
-    public class SettingsWindowViewModel : INotifyPropertyChanged
+    internal class SettingsWindowViewModel : INotifyPropertyChanged
     {
         private readonly FileNameSettings _settings;
         private readonly ILogService _logService;

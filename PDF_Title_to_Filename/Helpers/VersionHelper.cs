@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace PdfTitleRenamer.Helpers
 {
-    public static class VersionHelper
+    internal static class VersionHelper
     {
         public static string GetVersion()
         {

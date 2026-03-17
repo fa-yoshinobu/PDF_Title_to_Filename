@@ -2,7 +2,7 @@ using System.Windows.Input;
 
 namespace PdfTitleRenamer.ViewModels
 {
-    public class RelayCommand : ICommand
+    internal class RelayCommand : ICommand
     {
         private readonly Action _execute;
         private readonly Func<bool>? _canExecute;
@@ -31,7 +31,7 @@ namespace PdfTitleRenamer.ViewModels
         }
     }
 
-    public class RelayCommand<T> : ICommand
+    internal class RelayCommand<T> : ICommand
     {
         private readonly Action<T?> _execute;
         private readonly Func<T?, bool>? _canExecute;

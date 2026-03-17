@@ -15,7 +15,7 @@ using System.Windows;
 
 namespace PdfTitleRenamer.ViewModels
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    internal class MainWindowViewModel : INotifyPropertyChanged
     {
         // 状態定数（言語に依存しない）
         private const string STATUS_WAITING = "Waiting";
@@ -34,8 +34,8 @@ namespace PdfTitleRenamer.ViewModels
 
         private string _logText = "";
         private string _progressText = "";
-        private double _progressValue = 0;
-        private bool _isProcessing = false;
+        private double _progressValue;
+        private bool _isProcessing;
 
         public MainWindowViewModel(
             IPdfProcessingService pdfProcessingService,

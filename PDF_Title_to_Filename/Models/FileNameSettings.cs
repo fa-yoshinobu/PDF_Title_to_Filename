@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 
 namespace PdfTitleRenamer.Models
 {
-    public class FileNameSettings : INotifyPropertyChanged
+    internal class FileNameSettings : INotifyPropertyChanged
     {
         private string _customPrefix = "";
         private string _customSuffix = "";

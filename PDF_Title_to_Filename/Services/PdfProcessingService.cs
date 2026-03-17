@@ -4,10 +4,11 @@ using PdfTitleRenamer.Models;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace PdfTitleRenamer.Services
 {
-    public class PdfProcessingService : IPdfProcessingService
+    internal class PdfProcessingService : IPdfProcessingService
     {
         private readonly ILogger<PdfProcessingService> _logger;
         private readonly ILogService _logService;
@@ -94,7 +95,7 @@ namespace PdfTitleRenamer.Services
             var reservedNames = new[] { "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
             var nameWithoutExtension = Path.GetFileNameWithoutExtension(sanitized);
             
-            if (reservedNames.Contains(nameWithoutExtension.ToUpper()))
+            if (reservedNames.Contains(nameWithoutExtension.ToUpper(CultureInfo.InvariantCulture)))
             {
                 sanitized = $"_{sanitized}";
             }
@@ -123,7 +124,7 @@ namespace PdfTitleRenamer.Services
 
             do
             {
-                var newFileName = $"{fileNameWithoutExtension}({counter}){extension}";
+                var newFileName = $"{fileNameWithoutExtension}({counter.ToString(CultureInfo.InvariantCulture)}){extension}";
                 newFilePath = Path.Combine(directory, newFileName);
                 counter++;
             }

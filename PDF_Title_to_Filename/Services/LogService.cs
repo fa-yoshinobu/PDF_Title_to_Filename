@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
 using System.Text;
+using System.Globalization;
 
 namespace PdfTitleRenamer.Services
 {
-    public class LogService : ILogService
+    internal class LogService : ILogService
     {
         private readonly ILogger<LogService> _logger;
         private readonly StringBuilder _logBuilder = new();
@@ -23,7 +24,7 @@ namespace PdfTitleRenamer.Services
 
         public void LogError(string message, Exception? exception = null)
         {
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             var logMessage = $"[{timestamp}] ERROR: {message}";
             
             if (exception != null)
@@ -37,7 +38,7 @@ namespace PdfTitleRenamer.Services
 
         public void LogInfo(string message)
         {
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             var logMessage = $"[{timestamp}] INFO: {message}";
             
             AddToLog(logMessage);
@@ -46,7 +47,7 @@ namespace PdfTitleRenamer.Services
 
         public void LogWarning(string message)
         {
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             var logMessage = $"[{timestamp}] WARNING: {message}";
             
             AddToLog(logMessage);

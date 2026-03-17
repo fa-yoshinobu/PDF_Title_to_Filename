@@ -7,7 +7,7 @@ using System.IO;
 
 namespace PdfTitleRenamer.Views
 {
-    public partial class MainWindow : Window
+    internal partial class MainWindow : Window
     {
         private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext;
         private ILanguageService? _languageService;
