@@ -7,6 +7,12 @@ on:
   release:
     types:
       - published
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to scan
+        required: true
+        type: string
 
 jobs:
   virustotal:
@@ -15,10 +21,76 @@ jobs:
       contents: write
     steps:
       -
+        name: Download release assets
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p vt-assets
+          gh release download "${{ inputs.tag }}" --repo "${{ github.repository }}" --pattern "*.exe" --dir vt-assets
+          test -n "$(find vt-assets -maxdepth 1 -type f -name '*.exe' -print -quit)"
+      -
         name: VirusTotal Scan
+        if: github.event_name == 'release'
         uses: crazy-max/ghaction-virustotal@v4
         with:
           vt_api_key: ${{ secrets.VT_API_KEY }}
+          github_token: ${{ github.token }}
           update_release_body: true
           files: |
             .exe$
+      -
+        name: VirusTotal Scan downloaded assets
+        if: github.event_name == 'workflow_dispatch'
+        id: vt_manual
+        uses: crazy-max/ghaction-virustotal@v4
+        with:
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          github_token: ${{ github.token }}
+          files: |
+            vt-assets/*.exe
+      -
+        name: Append VirusTotal links to release body
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          ANALYSIS: ${{ steps.vt_manual.outputs.analysis }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          if [ -z "$ANALYSIS" ]; then
+            echo "No VirusTotal links returned."
+            exit 0
+          fi
+
+          release_id="$(gh api "repos/$REPO/releases/tags/$TAG" --jq .id)"
+          release_json="$(gh api "repos/$REPO/releases/tags/$TAG")"
+
+          export RELEASE_JSON="$release_json"
+          python - <<'PY'
+          import json
+          import os
+
+          analysis = os.environ["ANALYSIS"]
+          release = json.loads(os.environ["RELEASE_JSON"])
+          marker = "<!-- codex-virustotal-links -->"
+          body = release.get("body") or ""
+          if marker in body:
+              body = body.split(marker, 1)[0].rstrip()
+
+          links = []
+          for item in analysis.split(","):
+              if not item:
+                  continue
+              filename, url = item.split("=", 1)
+              links.append(f"- [{filename}]({url})")
+
+          section = marker + "\n\n### VirusTotal analysis\n" + "\n".join(links)
+          new_body = (body.rstrip() + "\n\n" + section).strip() + "\n"
+
+          with open("vt-release-body.json", "w", encoding="utf-8") as fh:
+              json.dump({"body": new_body}, fh, ensure_ascii=False)
+          PY
+
+          gh api "repos/$REPO/releases/$release_id" --method PATCH --input vt-release-body.json
