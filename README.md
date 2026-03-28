@@ -168,18 +168,17 @@ A fast and lightweight Windows application that extracts titles from PDF metadat
 ### Production (Recommended)
 ```bash
 # Create optimized single executable file
-dotnet publish PDF_Title_to_Filename\PDF_Title_to_Filename.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts\publish
+build.bat
 ```
 **Output Location**: `artifacts/publish/PDF_Title_to_Filename.exe` (Single file, no .NET Runtime required)
 **Features**: Optimized, detailed logging disabled, distribution ready
 
-### Debug
+### CI Check
 ```bash
-# Debug build with detailed logging enabled
-dotnet build PDF_Title_to_Filename\PDF_Title_to_Filename.csproj -c Debug
+# Run local CI checks
+ci.bat
 ```
-**Output Location**: `PDF_Title_to_Filename\bin\Debug\net8.0-windows\win-x64\PDF_Title_to_Filename.exe`
-**Features**: Detailed logging enabled, debug symbols enabled, for development and troubleshooting
+**Checks**: restore, tests, single-file publish smoke test
 
 ### Manual Build
 ```bash

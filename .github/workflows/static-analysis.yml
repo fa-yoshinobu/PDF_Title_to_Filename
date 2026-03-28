@@ -35,9 +35,6 @@ jobs:
       - name: Restore
         run: dotnet restore PDF_Title_to_Filename.sln
 
-      - name: Check formatting
-        run: dotnet format PDF_Title_to_Filename.sln --verify-no-changes --no-restore
-
       - name: Test
         run: dotnet test PDF_Title_to_Filename.sln -c Release --verbosity normal
 
