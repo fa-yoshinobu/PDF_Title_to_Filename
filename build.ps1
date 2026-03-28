@@ -1,7 +1,7 @@
 # PowerShell Build Script for PDF Title to Filename
 # 日本語対応版
 
-Write-Host "Building PDF Title to Filename Ver1.00 (Single File)..." -ForegroundColor Green
+Write-Host "Building PDF Title to Filename (Single File)..." -ForegroundColor Green
 Write-Host ""
 
 # 現在のディレクトリに移動
@@ -20,12 +20,12 @@ if ($LASTEXITCODE -eq 0) {
         Write-Host ""
         Write-Host "Single executable location:" -ForegroundColor Cyan
         Write-Host "   $PSScriptRoot\publish\PDF_Title_to_Filename.exe" -ForegroundColor White
-        
+
         $exePath = "$PSScriptRoot\publish\PDF_Title_to_Filename.exe"
         if (Test-Path $exePath) {
             $fileInfo = Get-Item $exePath
             $sizeMB = [math]::Round($fileInfo.Length / 1MB, 2)
-            
+
             Write-Host ""
             Write-Host "File information:" -ForegroundColor Cyan
             Write-Host "   - Size: $sizeMB MB ($($fileInfo.Length) bytes)" -ForegroundColor White

@@ -1,31 +1,57 @@
-name: Static Analysis
+name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
   pull_request:
-    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 jobs:
-  analyze:
+  build:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+          cache: true
+          cache-dependency-path: PDF_Title_to_Filename/PDF_Title_to_Filename.csproj
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore
+        run: dotnet restore PDF_Title_to_Filename.sln
 
-    - name: Run dotnet format (style check)
-      run: dotnet format --verify-no-changes --verbosity diagnostic
+      - name: Check formatting
+        run: dotnet format PDF_Title_to_Filename.sln --verify-no-changes --no-restore
 
-    - name: Run tests
-      run: dotnet test --no-restore --verbosity normal
+      - name: Test
+        run: dotnet test PDF_Title_to_Filename.sln -c Release --verbosity normal
 
-    - name: Build with static analysis
-      run: dotnet build --configuration Release --no-restore /p:RunAnalyzersDuringBuild=true /p:EnforceCodeStyleInBuild=true
+      - name: Publish single-file executable
+        run: dotnet publish PDF_Title_to_Filename\PDF_Title_to_Filename.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts\publish
+
+      - name: Verify publish output
+        shell: pwsh
+        run: |
+          $exe = "artifacts/publish/PDF_Title_to_Filename.exe"
+          if (-not (Test-Path $exe)) {
+            throw "Single-file executable was not created: $exe"
+          }
+
+          $file = Get-Item $exe
+          $sizeMiB = [math]::Round($file.Length / 1MB, 2)
+          Write-Host "Created $($file.Name) ($sizeMiB MiB)"

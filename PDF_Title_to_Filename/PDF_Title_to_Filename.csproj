@@ -12,8 +12,11 @@
     <AssemblyDescription>PDFファイルのタイトルからファイル名を自動生成するアプリケーション</AssemblyDescription>
     <AssemblyCompany>fa-yoshinobu</AssemblyCompany>
     <AssemblyProduct>PDF Title to Filename</AssemblyProduct>
-    <AssemblyVersion>1.0.5.0</AssemblyVersion>
-    <FileVersion>1.0.5.0</FileVersion>
+    <Version>1.0.6</Version>
+    <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <FileVersion>1.0.6.0</FileVersion>
+    <InformationalVersion>1.0.6</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>

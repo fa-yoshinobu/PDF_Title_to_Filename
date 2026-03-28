@@ -49,7 +49,7 @@ namespace PdfTitleRenamer.ViewModels
                                          public string Usage4 => _languageService.GetString("Usage4");
                      
                      // Value properties for AboutWindow
-                     public static string VersionValue => "1.0.4";
+                     public static string VersionValue => "1.0.6";
                      public static string AuthorValue => "fa-yoshinobu";
                      public static string LinkValue => "https://github.com/fa-yoshinobu/PDF_Title_to_Filename";
                      public string DevelopmentLanguageValue => _languageService.GetString("DevelopmentLanguageValue");
