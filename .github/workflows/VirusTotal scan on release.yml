@@ -13,21 +13,26 @@ on:
         description: Release tag to scan
         required: true
         type: string
+  repository_dispatch:
+    types:
+      - virustotal_scan_release
 
 jobs:
   virustotal:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.event.client_payload.tag || '' }}
     steps:
       -
         name: Download release assets
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name != 'release'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p vt-assets
-          gh release download "${{ inputs.tag }}" --repo "${{ github.repository }}" --pattern "*.exe" --dir vt-assets
+          gh release download "${{ env.RELEASE_TAG }}" --repo "${{ github.repository }}" --pattern "*.exe" --dir vt-assets
           test -n "$(find vt-assets -maxdepth 1 -type f -name '*.exe' -print -quit)"
       -
         name: VirusTotal Scan
@@ -41,7 +46,7 @@ jobs:
             .exe$
       -
         name: VirusTotal Scan downloaded assets
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name != 'release'
         id: vt_manual
         uses: crazy-max/ghaction-virustotal@v4
         with:
@@ -51,12 +56,12 @@ jobs:
             vt-assets/*.exe
       -
         name: Append VirusTotal links to release body
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name != 'release'
         env:
           ANALYSIS: ${{ steps.vt_manual.outputs.analysis }}
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          TAG: ${{ inputs.tag }}
+          TAG: ${{ env.RELEASE_TAG }}
         shell: bash
         run: |
           if [ -z "$ANALYSIS" ]; then
