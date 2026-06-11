@@ -39,9 +39,9 @@ namespace PdfTitleRenamer.Models
         {
             get
             {
-                if (FileNameElement._languageService != null)
+                if (FileNameElement.LanguageService != null)
                 {
-                    return FileNameElement._languageService.GetString(_newFileName) ?? _newFileName;
+                    return FileNameElement.LanguageService.GetString(_newFileName) ?? _newFileName;
                 }
                 return _newFileName;
             }
@@ -73,9 +73,9 @@ namespace PdfTitleRenamer.Models
         {
             get
             {
-                if (FileNameElement._languageService != null)
+                if (FileNameElement.LanguageService != null)
                 {
-                    return FileNameElement._languageService.GetString(Status) ?? Status;
+                    return FileNameElement.LanguageService.GetString(Status) ?? Status;
                 }
                 return Status;
             }

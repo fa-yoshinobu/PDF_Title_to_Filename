@@ -9,7 +9,9 @@ namespace PdfTitleRenamer.Models
     {
         private bool _isEnabled;
         private string _elementType = string.Empty;
-        public static ILanguageService? _languageService;
+        private static ILanguageService? _languageService;
+
+        internal static ILanguageService? LanguageService => _languageService;
 
         public FileNameElement(string elementType, bool isEnabled = true)
         {
@@ -33,13 +35,13 @@ namespace PdfTitleRenamer.Models
         {
             get => ElementType switch
             {
-                "Title" => _languageService?.GetString("PDFTitleDisplay") ?? "PDF Title",
-                "Author" => _languageService?.GetString("PDFAuthorDisplay") ?? "PDF Author",
-                "Subject" => _languageService?.GetString("PDFSubjectDisplay") ?? "PDF Subject",
-                "Keywords" => _languageService?.GetString("PDFKeywordsDisplay") ?? "PDF Keywords",
-                "OriginalFileName" => _languageService?.GetString("OriginalFileNameDisplay") ?? "Original File Name",
-                "CustomPrefix" => _languageService?.GetString("CustomPrefixDisplay") ?? "Prefix",
-                "CustomSuffix" => _languageService?.GetString("CustomSuffixDisplay") ?? "Suffix",
+                "Title" => LanguageService?.GetString("PDFTitleDisplay") ?? "PDF Title",
+                "Author" => LanguageService?.GetString("PDFAuthorDisplay") ?? "PDF Author",
+                "Subject" => LanguageService?.GetString("PDFSubjectDisplay") ?? "PDF Subject",
+                "Keywords" => LanguageService?.GetString("PDFKeywordsDisplay") ?? "PDF Keywords",
+                "OriginalFileName" => LanguageService?.GetString("OriginalFileNameDisplay") ?? "Original File Name",
+                "CustomPrefix" => LanguageService?.GetString("CustomPrefixDisplay") ?? "Prefix",
+                "CustomSuffix" => LanguageService?.GetString("CustomSuffixDisplay") ?? "Suffix",
                 _ => ElementType
             };
         }

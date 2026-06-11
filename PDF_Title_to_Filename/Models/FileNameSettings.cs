@@ -267,9 +267,9 @@ namespace PdfTitleRenamer.Models
         private string GetDefaultPreviewValue(string key)
         {
             // LanguageServiceが利用可能な場合はローカライズされた値を取得
-            if (FileNameElement._languageService != null)
+            if (FileNameElement.LanguageService != null)
             {
-                return FileNameElement._languageService.GetString(key) ?? GetFallbackValue(key);
+                return FileNameElement.LanguageService.GetString(key) ?? GetFallbackValue(key);
             }
             return GetFallbackValue(key);
         }
