@@ -132,6 +132,11 @@ namespace PdfTitleRenamer.Models
         // 設定を保存
         public void Save()
         {
+            Save(GetSettingsFilePath());
+        }
+
+        internal void Save(string settingsPath)
+        {
             try
             {
                 // デフォルト設定を確実に初期化
@@ -140,8 +145,6 @@ namespace PdfTitleRenamer.Models
                     Elements = CreateDefaultElements();
                 }
 
-                // 設定ファイルパスを取得
-                var settingsPath = GetSettingsFilePath();
                 var settingsDirectory = Path.GetDirectoryName(settingsPath);
 
                 // ディレクトリが存在しない場合は作成
@@ -179,10 +182,13 @@ namespace PdfTitleRenamer.Models
         // 設定を読み込み
         public static FileNameSettings Load()
         {
+            return Load(GetSettingsFilePath());
+        }
+
+        internal static FileNameSettings Load(string settingsPath)
+        {
             try
             {
-                var settingsPath = GetSettingsFilePath();
-                
                 if (File.Exists(settingsPath))
                 {
                     var json = File.ReadAllText(settingsPath);
