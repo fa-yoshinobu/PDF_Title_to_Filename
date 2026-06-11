@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.IO;
+using System.Text;
 using Microsoft.Win32;
 using PdfTitleRenamer.Models;
 using PdfTitleRenamer.Services;
@@ -325,6 +326,13 @@ namespace PdfTitleRenamer.ViewModels
             IsProcessing = true;
             ProgressValue = 0;
             ProgressText = _languageService.GetString("Processing");
+            var logBuilder = new StringBuilder();
+
+            void AppendLog(string value)
+            {
+                logBuilder.Append(value);
+                LogText = logBuilder.ToString();
+            }
 
             try
             {
@@ -341,13 +349,13 @@ namespace PdfTitleRenamer.ViewModels
                 var skippedInProcessCount = 0;
                 var errorCount = 0;
 
-                LogText = $"{_languageService.GetString("ProcessingStartLog")}: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n";
-                LogText += $"{_languageService.GetString("TargetFileCountLog")}: {totalFiles}";
+                AppendLog($"{_languageService.GetString("ProcessingStartLog")}: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n");
+                AppendLog($"{_languageService.GetString("TargetFileCountLog")}: {totalFiles}");
                 if (skippedCount > 0)
                 {
-                    LogText += $" ({_languageService.GetString("SkippedCountLog")}: {skippedCount}{_languageService.GetString("FilesUnit")})";
+                    AppendLog($" ({_languageService.GetString("SkippedCountLog")}: {skippedCount}{_languageService.GetString("FilesUnit")})");
                 }
-                LogText += "\n\n";
+                AppendLog("\n\n");
 
                 foreach (var fileItem in filesToProcess)
                 {
@@ -373,7 +381,7 @@ namespace PdfTitleRenamer.ViewModels
                         if (string.IsNullOrWhiteSpace(generatedFileName))
                         {
                             skippedInProcessCount++;
-                            LogText += $"⊘ {fileItem.FileName}: {_languageService.GetString("NoMetadata")}\n";
+                            AppendLog($"⊘ {fileItem.FileName}: {_languageService.GetString("NoMetadata")}\n");
                             fileItem.Status = STATUS_NO_METADATA;
                             fileItem.ErrorDetails = _languageService.GetString("NoMetadataError");
                         }
@@ -387,7 +395,7 @@ namespace PdfTitleRenamer.ViewModels
                             if (string.Equals(fileItem.FileName, newFileName, StringComparison.OrdinalIgnoreCase))
                             {
                                 skippedInProcessCount++;
-                                LogText += $"⊘ {fileItem.FileName}: {_languageService.GetString("NoChangeNeeded")}\n";
+                                AppendLog($"⊘ {fileItem.FileName}: {_languageService.GetString("NoChangeNeeded")}\n");
                                 fileItem.Status = STATUS_NO_CHANGE_NEEDED;
                                 fileItem.ErrorDetails = _languageService.GetString("AlreadyProperlySet");
                             }
@@ -402,7 +410,7 @@ namespace PdfTitleRenamer.ViewModels
                                     File.Move(fileItem.FilePath, uniqueFilePath);
                                     
                                     successCount++;
-                                    LogText += $"✓ {fileItem.FileName} → {finalFileName}\n";
+                                    AppendLog($"✓ {fileItem.FileName} → {finalFileName}\n");
                                     
                                     fileItem.NewFileName = finalFileName;
                                     fileItem.Status = STATUS_RENAME_COMPLETE;
@@ -411,7 +419,7 @@ namespace PdfTitleRenamer.ViewModels
                                 catch (Exception ex)
                                 {
                                     errorCount++;
-                                    LogText += $"✗ {fileItem.FileName}: {ex.Message}\n";
+                                    AppendLog($"✗ {fileItem.FileName}: {ex.Message}\n");
                                     fileItem.Status = STATUS_ERROR;
                                     fileItem.ErrorDetails = $"{_languageService.GetString("FileMoveError")}: {ex.Message}";
                                 }
@@ -421,7 +429,7 @@ namespace PdfTitleRenamer.ViewModels
                     catch (Exception ex)
                     {
                         errorCount++;
-                        LogText += $"✗ {Path.GetFileName(fileItem.FilePath)}: {ex.Message}\n";
+                        AppendLog($"✗ {Path.GetFileName(fileItem.FilePath)}: {ex.Message}\n");
                         
                         fileItem.Status = STATUS_ERROR;
                         fileItem.ErrorDetails = $"{_languageService.GetString("ProcessingError")}: {ex.Message}";
@@ -431,14 +439,14 @@ namespace PdfTitleRenamer.ViewModels
                     ProgressValue = (double)processedFiles / totalFiles * 100;
                 }
 
-                LogText += $"\n{_languageService.GetString("ProcessingCompleteLog")}: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n";
-                LogText += $"{_languageService.GetString("SuccessCountLog")}: {successCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("SkippedCountLog")}: {skippedInProcessCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("ErrorCountLog")}: {errorCount}{_languageService.GetString("FilesUnit")}\n";
+                AppendLog($"\n{_languageService.GetString("ProcessingCompleteLog")}: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n");
+                AppendLog($"{_languageService.GetString("SuccessCountLog")}: {successCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("SkippedCountLog")}: {skippedInProcessCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("ErrorCountLog")}: {errorCount}{_languageService.GetString("FilesUnit")}\n");
                 
                 ProgressText = $"{_languageService.GetString("ProcessingCompleteLog")} - {_languageService.GetString("SuccessCountLog")}: {successCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("SkippedCountLog")}: {skippedInProcessCount}{_languageService.GetString("FilesUnit")}, {_languageService.GetString("ErrorCountLog")}: {errorCount}{_languageService.GetString("FilesUnit")}";
             }
             catch (Exception ex)
             {
-                LogText += $"\n{_languageService.GetString("ProcessingErrorLog")}: {ex.Message}\n";
+                AppendLog($"\n{_languageService.GetString("ProcessingErrorLog")}: {ex.Message}\n");
                 ProgressText = _languageService.GetString("ProcessingErrorOccurred");
             }
             finally
