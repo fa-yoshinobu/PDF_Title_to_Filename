@@ -549,10 +549,21 @@ namespace PdfTitleRenamer.ViewModels
             }
         }
 
+#pragma warning disable CA1031 // async void boundary: log unexpected preview refresh failures.
         private async void UpdateAllFilePreviews()
         {
-            await UpdateAllFilePreviewsAsync();
+            try
+            {
+#pragma warning disable CA2007 // Continue on the UI context for preview refresh updates.
+                await UpdateAllFilePreviewsAsync();
+#pragma warning restore CA2007
+            }
+            catch (Exception ex)
+            {
+                _logService.LogError($"{_languageService.GetString("ProcessingErrorLog")}: {ex.Message}", ex);
+            }
         }
+#pragma warning restore CA1031
 
         public ILanguageService GetLanguageService() => _languageService;
 
