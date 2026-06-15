@@ -2,8 +2,7 @@
 
 [![Release](https://img.shields.io/github/v/release/fa-yoshinobu/PDF_Title_to_Filename?display_name=tag)](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/fa-yoshinobu/PDF_Title_to_Filename/static-analysis.yml?branch=main&label=CI)](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/actions/workflows/static-analysis.yml)
-[![Auto Release](https://img.shields.io/github/actions/workflow/status/fa-yoshinobu/PDF_Title_to_Filename/release.yml?label=Auto%20Release)](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/actions/workflows/release.yml)
-[![License](https://img.shields.io/github/license/fa-yoshinobu/PDF_Title_to_Filename)](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/download/dotnet/8.0)
 
 **English | [日本語](#日本語)**
