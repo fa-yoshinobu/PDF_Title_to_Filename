@@ -42,6 +42,42 @@ namespace PDF_Title_to_Filename.Tests
         }
 
         [Fact]
+        public void GenerateFileNameParts_KeepsElementTypesForSanitizing()
+        {
+            var settings = new FileNameSettings
+            {
+                CustomPrefix = "  PRE  ",
+                Separator = " | ",
+                Elements = new ObservableCollection<FileNameElement>
+                {
+                    new("CustomPrefix", true),
+                    new("Title", true),
+                    new("OriginalFileName", true)
+                }
+            };
+
+            var result = settings.GenerateFileNameParts("ＯＲＩＧ.pdf", "  Ａ | Ｂ  ", "", "", "");
+
+            Assert.Collection(
+                result,
+                part =>
+                {
+                    Assert.Equal("CustomPrefix", part.ElementType);
+                    Assert.Equal("PRE", part.Value);
+                },
+                part =>
+                {
+                    Assert.Equal("Title", part.ElementType);
+                    Assert.Equal("Ａ | Ｂ", part.Value);
+                },
+                part =>
+                {
+                    Assert.Equal("OriginalFileName", part.ElementType);
+                    Assert.Equal("ＯＲＩＧ", part.Value);
+                });
+        }
+
+        [Fact]
         public void GenerateFileName_ReturnsEmptyStringWhenEnabledValuesAreEmpty()
         {
             var settings = new FileNameSettings
@@ -150,6 +186,45 @@ namespace PDF_Title_to_Filename.Tests
         }
 
         [Fact]
+        public void FileNameSettings_SaveFallsBackToTempWhenTargetCannotBeWritten()
+        {
+            var directory = CreateTempDirectory();
+            var fallbackPath = Path.Combine(Path.GetTempPath(), "PDF_Title_to_Filename_settings.json");
+
+            try
+            {
+                if (File.Exists(fallbackPath))
+                {
+                    File.Delete(fallbackPath);
+                }
+
+                var settings = new FileNameSettings
+                {
+                    CustomPrefix = "Fallback",
+                    Elements = new ObservableCollection<FileNameElement>
+                    {
+                        new("Title", true)
+                    }
+                };
+
+                settings.Save(directory);
+
+                Assert.True(File.Exists(fallbackPath));
+                Assert.Contains("\"CustomPrefix\": \"Fallback\"", File.ReadAllText(fallbackPath), StringComparison.Ordinal);
+                Assert.False(File.Exists(Path.Combine(directory, "test_write.tmp")));
+            }
+            finally
+            {
+                if (File.Exists(fallbackPath))
+                {
+                    File.Delete(fallbackPath);
+                }
+
+                DeleteDirectory(directory);
+            }
+        }
+
+        [Fact]
         public void FileNameSettings_LoadFallsBackToDefaultWhenJsonIsInvalid()
         {
             var directory = CreateTempDirectory();
@@ -171,7 +246,7 @@ namespace PDF_Title_to_Filename.Tests
         }
 
         [Fact]
-        public void SanitizeFileNameWithNfkcControl_PreservesCurrentSkippedElementIndexDrift()
+        public void SanitizeFileNameWithNfkcControl_UsesOriginalFileNameRuleAfterSkippedMetadata()
         {
             var settings = new FileNameSettings
             {
@@ -183,17 +258,15 @@ namespace PDF_Title_to_Filename.Tests
                 }
             };
             var viewModel = CreateViewModel(settings);
-            var generated = settings.GenerateFileName("ＯＲＩＧ.pdf", "", "", "", "");
+            var generatedParts = settings.GenerateFileNameParts("ＯＲＩＧ.pdf", "", "", "", "");
 
-            // Known issue fixed as current behavior: the empty Title is skipped by GenerateFileName,
-            // but the sanitizer still maps the first generated part to the first enabled element.
-            var result = InvokeSanitizeFileNameWithNfkcControl(viewModel, generated);
+            var result = InvokeSanitizeFileNameWithNfkcControl(viewModel, generatedParts);
 
-            Assert.Equal("ORIG", result);
+            Assert.Equal("ＯＲＩＧ", result);
         }
 
         [Fact]
-        public void SanitizeFileNameWithNfkcControl_PreservesCurrentSeparatorSplitDrift()
+        public void SanitizeFileNameWithNfkcControl_KeepsMetadataContainingSeparatorAsOnePart()
         {
             var settings = new FileNameSettings
             {
@@ -205,13 +278,11 @@ namespace PDF_Title_to_Filename.Tests
                 }
             };
             var viewModel = CreateViewModel(settings);
-            var generated = settings.GenerateFileName("ＯＲＩＧ.pdf", "Ａ - Ｂ", "", "", "");
+            var generatedParts = settings.GenerateFileNameParts("ＯＲＩＧ.pdf", "Ａ - Ｂ", "", "", "");
 
-            // Known issue fixed as current behavior: metadata containing the separator is split
-            // as if it were multiple filename elements, and extra parts are dropped.
-            var result = InvokeSanitizeFileNameWithNfkcControl(viewModel, generated);
+            var result = InvokeSanitizeFileNameWithNfkcControl(viewModel, generatedParts);
 
-            Assert.Equal("A - Ｂ", result);
+            Assert.Equal("A - B - ＯＲＩＧ", result);
         }
 
         private static PdfProcessingService CreatePdfProcessingService()
@@ -235,13 +306,13 @@ namespace PDF_Title_to_Filename.Tests
             return viewModel;
         }
 
-        private static string InvokeSanitizeFileNameWithNfkcControl(MainWindowViewModel viewModel, string fileName)
+        private static string InvokeSanitizeFileNameWithNfkcControl(MainWindowViewModel viewModel, IReadOnlyList<FileNamePart> parts)
         {
             var method = typeof(MainWindowViewModel).GetMethod(
                 "SanitizeFileNameWithNFKCControl",
                 BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.NotNull(method);
-            return Assert.IsType<string>(method.Invoke(viewModel, new object[] { fileName }));
+            return Assert.IsType<string>(method.Invoke(viewModel, new object[] { parts }));
         }
 
         private static string CreateTempDirectory()

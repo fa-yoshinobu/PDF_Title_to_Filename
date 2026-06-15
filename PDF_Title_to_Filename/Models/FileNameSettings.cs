@@ -6,8 +6,12 @@ using System.Collections.ObjectModel;
 
 namespace PdfTitleRenamer.Models
 {
+    internal readonly record struct FileNamePart(string ElementType, string Value);
+
     internal class FileNameSettings : INotifyPropertyChanged
     {
+        private static readonly JsonSerializerOptions SerializerOptions = new() { WriteIndented = true };
+
         private string _customPrefix = "";
         private string _customSuffix = "";
         private string _separator = " - ";
@@ -137,45 +141,55 @@ namespace PdfTitleRenamer.Models
 
         internal void Save(string settingsPath)
         {
+            // デフォルト設定を確実に初期化
+            if (Elements == null || Elements.Count == 0)
+            {
+                Elements = CreateDefaultElements();
+            }
+
+            var json = JsonSerializer.Serialize(this, SerializerOptions);
+
+            if (TryWriteSettings(settingsPath, json))
+            {
+                return;
+            }
+
+            var fallbackPath = Path.Combine(Path.GetTempPath(), "PDF_Title_to_Filename_settings.json");
+            _ = TryWriteSettings(fallbackPath, json);
+        }
+
+        private static bool TryWriteSettings(string settingsPath, string json)
+        {
             try
             {
-                // デフォルト設定を確実に初期化
-                if (Elements == null || Elements.Count == 0)
-                {
-                    Elements = CreateDefaultElements();
-                }
-
                 var settingsDirectory = Path.GetDirectoryName(settingsPath);
-
-                // ディレクトリが存在しない場合は作成
-                if (!string.IsNullOrEmpty(settingsDirectory) && !Directory.Exists(settingsDirectory))
+                if (!string.IsNullOrEmpty(settingsDirectory))
                 {
                     Directory.CreateDirectory(settingsDirectory);
                 }
 
-                // 書き込み権限の確認
-                try
-                {
-                    if (!string.IsNullOrEmpty(settingsDirectory))
-                    {
-                        var testFile = Path.Combine(settingsDirectory, "test_write.tmp");
-                        File.WriteAllText(testFile, "test");
-                        File.Delete(testFile);
-                    }
-                }
-                catch (Exception)
-                {
-                    // 書き込み権限がない場合は、一時ディレクトリを使用
-                    var tempPath = Path.GetTempPath();
-                    settingsPath = Path.Combine(tempPath, "PDF_Title_to_Filename_settings.json");
-                }
-
-                var json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(settingsPath, json);
+                return true;
             }
-            catch (Exception)
+            catch (IOException)
             {
-                // 設定保存に失敗した場合は無視（デフォルト設定を使用）
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
+            catch (System.Security.SecurityException)
+            {
+                return false;
+            }
+            catch (NotSupportedException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
+            {
+                return false;
             }
         }
 
@@ -215,7 +229,26 @@ namespace PdfTitleRenamer.Models
         // テンプレートからファイル名を生成
         public string GenerateFileName(string originalFileName, string title, string author, string subject, string keywords)
         {
-            var parts = new List<string>();
+            var parts = GenerateFileNameParts(originalFileName, title, author, subject, keywords);
+
+            // パーツがない場合は空文字列を返す（メタデータなしとして処理）
+            if (parts.Count == 0)
+            {
+                return "";
+            }
+
+            // セパレータで結合
+            return string.Join(Separator, parts.Select(part => part.Value));
+        }
+
+        internal IReadOnlyList<FileNamePart> GenerateFileNameParts(
+            string originalFileName,
+            string title,
+            string author,
+            string subject,
+            string keywords)
+        {
+            var parts = new List<FileNamePart>();
 
             // ログサービスは直接取得できないため、ログ出力は行わない
             // 代わりにMainWindowViewModelでログを出力する
@@ -237,18 +270,11 @@ namespace PdfTitleRenamer.Models
 
                 if (!string.IsNullOrWhiteSpace(value))
                 {
-                    parts.Add(value);
+                    parts.Add(new FileNamePart(element.ElementType, value));
                 }
             }
 
-            // パーツがない場合は空文字列を返す（メタデータなしとして処理）
-            if (parts.Count == 0)
-            {
-                return "";
-            }
-
-            // セパレータで結合
-            return string.Join(Separator, parts);
+            return parts;
         }
 
         // プレビュー用のファイル名生成

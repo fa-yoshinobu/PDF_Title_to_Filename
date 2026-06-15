@@ -229,12 +229,13 @@ namespace PdfTitleRenamer.ViewModels
 
                 
                 // 設定に基づいてファイル名を生成（メタデータチェックも含む）
-                var generatedFileName = _settings.GenerateFileName(
+                var generatedParts = _settings.GenerateFileNameParts(
                     fileItem.FileName,
                     metadata.Title ?? string.Empty,
                     metadata.Author ?? string.Empty,
                     metadata.Subject ?? string.Empty,
                     metadata.Keywords ?? string.Empty);
+                var generatedFileName = JoinFileNameParts(generatedParts);
 
 #if ENABLE_DETAILED_LOGGING
                 // ファイル名生成の詳細ログ
@@ -269,7 +270,7 @@ namespace PdfTitleRenamer.ViewModels
                 }
 
                 // ファイル名をサニタイズ（NFKC正規化制御付き）
-                var validFileName = SanitizeFileNameWithNFKCControl(generatedFileName);
+                var validFileName = SanitizeFileNameWithNFKCControl(generatedParts);
                 var predictedFileName = $"{validFileName}.pdf";
                 
                 fileItem.NewFileName = predictedFileName;
@@ -371,12 +372,13 @@ namespace PdfTitleRenamer.ViewModels
 
                         
                         // 設定に基づいてファイル名を生成（メタデータチェックも含む）
-                        var generatedFileName = _settings.GenerateFileName(
+                        var generatedParts = _settings.GenerateFileNameParts(
                             fileItem.FileName,
                             metadata.Title ?? string.Empty,
                             metadata.Author ?? string.Empty,
                             metadata.Subject ?? string.Empty,
                             metadata.Keywords ?? string.Empty);
+                        var generatedFileName = JoinFileNameParts(generatedParts);
 
                         if (string.IsNullOrWhiteSpace(generatedFileName))
                         {
@@ -388,7 +390,7 @@ namespace PdfTitleRenamer.ViewModels
                         else
                         {
                             // ファイル名の各部分を個別にサニタイズ（NFKC正規化の制御付き）
-                            var sanitizedFileName = SanitizeFileNameWithNFKCControl(generatedFileName);
+                            var sanitizedFileName = SanitizeFileNameWithNFKCControl(generatedParts);
                             var newFileName = $"{sanitizedFileName}.pdf";
                             var newFilePath = Path.Combine(Path.GetDirectoryName(fileItem.FilePath)!, newFileName);
 
@@ -601,21 +603,20 @@ namespace PdfTitleRenamer.ViewModels
             return _settings.Elements.Any(e => e.IsEnabled && metadataElements.Contains(e.ElementType));
         }
 
-        private string SanitizeFileNameWithNFKCControl(string fileName)
+        private string JoinFileNameParts(IReadOnlyList<FileNamePart> parts)
         {
-            // 生成されたファイル名をセパレータで分割
-            var parts = fileName.Split(new[] { _settings.Separator }, StringSplitOptions.None);
+            return string.Join(_settings.Separator, parts.Select(part => part.Value));
+        }
+
+        private string SanitizeFileNameWithNFKCControl(IReadOnlyList<FileNamePart> parts)
+        {
             var sanitizedParts = new List<string>();
-            var enabledElements = _settings.Elements.Where(e => e.IsEnabled).ToList();
 
             // 各部分を個別にサニタイズ
-            for (int i = 0; i < parts.Length && i < enabledElements.Count; i++)
+            foreach (var part in parts)
             {
-                var part = parts[i];
-                var element = enabledElements[i];
-
                 // NFKC正規化の適用制御
-                bool applyNFKC = element.ElementType switch
+                bool applyNFKC = part.ElementType switch
                 {
                     "OriginalFileName" => false, // 変更前のファイル名は除外
                     "CustomPrefix" => false,     // プレフィックスは除外
@@ -623,7 +624,7 @@ namespace PdfTitleRenamer.ViewModels
                     _ => true                    // その他は適用
                 };
 
-                var sanitizedPart = _pdfProcessingService.SanitizeFileName(part, applyNFKC);
+                var sanitizedPart = _pdfProcessingService.SanitizeFileName(part.Value, applyNFKC);
                 sanitizedParts.Add(sanitizedPart);
             }
 
