@@ -1,0 +1,72 @@
+name: Scan release with VirusTotal
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Published release tag to check (e.g. v0.2.0)
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      release_tag:
+        required: true
+        type: string
+    secrets:
+      VT_API_KEY:
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: virustotal-release-${{ github.event_name == 'release' && github.event.release.tag_name || inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      REPO: ${{ github.repository }}
+      TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.release_tag }}
+
+    steps:
+      # Use the current checker even when rescanning an older release tag.
+      - name: Checkout release checker
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+
+      - name: Test release checker
+        run: |
+          python -m unittest discover -s tests/release -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Scan published executables and update release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VIRUSTOTAL_API_KEY: ${{ secrets.VT_API_KEY }}
+        run: |
+          python .github/scripts/check_release_virustotal.py --repository "$env:REPO" --release-tag "$env:TAG" --output-dir artifacts/virustotal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload scan reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: virustotal-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/virustotal/reports/
+          if-no-files-found: ignore
+          retention-days: 30

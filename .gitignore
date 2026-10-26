@@ -447,3 +447,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Release tooling tests are source files, not build output.
+!/tests/release/
+!/tests/release/*.py

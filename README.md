@@ -221,3 +221,19 @@ dotnet publish PDF_Title_to_Filename\PDF_Title_to_Filename.csproj --configuratio
 ## ライセンス
 
 このプロジェクトは MIT License です。詳細は [LICENSE](LICENSE) を参照してください。
+
+## Release distribution (next release)
+
+The fixed-name ZIP and checksum links below become available with the next standard release. Existing release assets and the download links above remain unchanged.
+
+- [Latest Windows x64 ZIP](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/releases/latest/download/PDF_Title_to_Filename-win-x64.zip)
+- [ZIP SHA-256 checksum](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/releases/latest/download/PDF_Title_to_Filename-win-x64.zip.sha256)
+- [Changelog](CHANGELOG.md) / [TODO](TODO.md)
+
+Extract the ZIP file, then run `PDF_Title_to_Filename.exe`.
+
+Windows x64. The .NET runtime is included.
+
+Release notes and VirusTotal scan messages are in English. Existing project documents may keep their current language.
+
+Maintainers: update the English Changes section in `.github/release-notes.md` from the relevant CHANGELOG entries before releasing. The release workflow publishes the ZIP and checksum, then scans the actual published executables. Use the `Scan release with VirusTotal` workflow with a release tag to retry an incomplete scan. See the [shared release standard](https://github.com/fa-yoshinobu/release_standard).

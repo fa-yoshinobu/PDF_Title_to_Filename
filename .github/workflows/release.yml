@@ -20,6 +20,8 @@ env:
 
 jobs:
   release:
+    outputs:
+      release_tag: ${{ steps.publish_release.outputs.release_tag }}
     runs-on: windows-latest
 
     steps:
@@ -89,31 +91,40 @@ jobs:
           --no-restore
           -o artifacts\publish
 
-      - name: Prepare release assets
-        shell: pwsh
-        run: |
-          $publishExe = "artifacts/publish/PDF_Title_to_Filename.exe"
-          if (-not (Test-Path $publishExe)) {
-            throw "Single-file executable was not created: $publishExe"
-          }
-
-          New-Item -ItemType Directory -Path artifacts\release -Force | Out-Null
-
-          $assetName = "PDF_Title_to_Filename-$env:APP_VERSION-win-x64.exe"
-          $assetPath = Join-Path "artifacts/release" $assetName
-
-          Copy-Item $publishExe $assetPath
-
-          $hash = (Get-FileHash $assetPath -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash *$assetName" | Set-Content "$assetPath.sha256"
-
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+      - name: Set up release tools
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
-          name: PDF Title to Filename ${{ env.APP_VERSION }}
-          generate_release_notes: true
-          fail_on_unmatched_files: true
-          prerelease: ${{ contains(github.ref_name, '-') }}
-          files: |
-            artifacts\release\PDF_Title_to_Filename-${{ env.APP_VERSION }}-win-x64.exe
-            artifacts\release\PDF_Title_to_Filename-${{ env.APP_VERSION }}-win-x64.exe.sha256
+          python-version: '3.13'
+
+      - name: Prepare ZIP checksum and English release notes
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python .github/scripts/release_assets.py prepare --repository "$env:GITHUB_REPOSITORY" --release-tag "$env:RELEASE_TAG" --asset-name PDF_Title_to_Filename-win-x64.zip --file artifacts/publish/PDF_Title_to_Filename.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Publish ZIP and checksum
+        id: publish_release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          $releaseArgs = @('release', 'create', $env:RELEASE_TAG, '--repo', $env:GITHUB_REPOSITORY,
+            '--verify-tag', '--title', "PDF Title to Filename $env:RELEASE_TAG", '--notes-file', 'artifacts/release/release-notes.md',
+            'artifacts/release/PDF_Title_to_Filename-win-x64.zip', 'artifacts/release/PDF_Title_to_Filename-win-x64.zip.sha256')
+          if ($env:RELEASE_TAG.Contains('-')) { $releaseArgs += '--prerelease' }
+          gh @releaseArgs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "release_tag=$env:RELEASE_TAG" >> $env:GITHUB_OUTPUT
+
+  check-published-release:
+    needs: release
+    permissions:
+      contents: write
+    uses: ./.github/workflows/virustotal-release.yml
+    with:
+      release_tag: ${{ needs.release.outputs.release_tag }}
+    secrets:
+      VT_API_KEY: ${{ secrets.VT_API_KEY }}

@@ -1,0 +1,20 @@
+name: Test release tools
+on:
+  push:
+    paths: ['.github/**', 'tests/release/**']
+  pull_request:
+    paths: ['.github/**', 'tests/release/**']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Test release tools without external API calls
+        run: python -B -m unittest discover -s tests/release -v
