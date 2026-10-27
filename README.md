@@ -222,9 +222,9 @@ dotnet publish PDF_Title_to_Filename\PDF_Title_to_Filename.csproj --configuratio
 
 このプロジェクトは MIT License です。詳細は [LICENSE](LICENSE) を参照してください。
 
-## Release distribution (next release)
+## Release distribution
 
-The fixed-name ZIP and checksum links below become available with the next standard release. Existing release assets and the download links above remain unchanged.
+The fixed-name ZIP and checksum links below are available for the current release. Older releases retain their original assets.
 
 - [Latest Windows x64 ZIP](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/releases/latest/download/PDF_Title_to_Filename-win-x64.zip)
 - [ZIP SHA-256 checksum](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/releases/latest/download/PDF_Title_to_Filename-win-x64.zip.sha256)

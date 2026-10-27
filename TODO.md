@@ -4,8 +4,11 @@ GitHub Markdown task lists: `- [ ]` open, `- [x]` completed.
 
 ## Open
 
-- [ ] 次回のリリースで、新しいZIP・SHA-256・英語本文・VirusTotal結果の掲載を確認する（今回は未リリース）。
+No open checklist items.
+
 
 ## Completed
+
+- [x] v1.0.8: 公開ZIPとSHA-256、EXEのバージョンとハッシュ、英語本文、VirusTotal解析完了と結果リンク掲載を確認。
 
 Completed changes are tracked in [CHANGELOG.md](CHANGELOG.md).
