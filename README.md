@@ -3,7 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/fa-yoshinobu/PDF_Title_to_Filename?display_name=tag)](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/fa-yoshinobu/PDF_Title_to_Filename/static-analysis.yml?branch=main&label=CI)](https://github.com/fa-yoshinobu/PDF_Title_to_Filename/actions/workflows/static-analysis.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/download/dotnet/8.0)
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)](https://dotnet.microsoft.com/download/dotnet/10.0)
 
 **English | [日本語](#日本語)**
 
@@ -88,7 +88,7 @@ ci.bat
 Requirements:
 
 - Windows
-- .NET 8 SDK
+- .NET 10 SDK
 
 Useful commands:
 
@@ -103,7 +103,7 @@ dotnet publish PDF_Title_to_Filename\PDF_Title_to_Filename.csproj --configuratio
 
 | Library | Purpose |
 | --- | --- |
-| UglyToad.PdfPig | PDF metadata extraction |
+| PdfPig | PDF metadata extraction |
 | Microsoft.Extensions.DependencyInjection | Dependency injection |
 | Microsoft.Extensions.Logging | Logging |
 | System.Text.Encoding.CodePages | Additional encoding support |
@@ -198,7 +198,7 @@ ci.bat
 必要なもの:
 
 - Windows
-- .NET 8 SDK
+- .NET 10 SDK
 
 よく使うコマンド:
 
@@ -213,7 +213,7 @@ dotnet publish PDF_Title_to_Filename\PDF_Title_to_Filename.csproj --configuratio
 
 | ライブラリ | 用途 |
 | --- | --- |
-| UglyToad.PdfPig | PDF メタデータ抽出 |
+| PdfPig | PDF メタデータ抽出 |
 | Microsoft.Extensions.DependencyInjection | 依存性注入 |
 | Microsoft.Extensions.Logging | ログ |
 | System.Text.Encoding.CodePages | 追加エンコーディング対応 |

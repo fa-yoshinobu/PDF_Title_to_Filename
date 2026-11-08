@@ -223,12 +223,12 @@
                                     BorderThickness="1"
                                     BorderBrush="#E2E8F0">
                                 <StackPanel>
-                                    <TextBlock Text="UglyToad.PdfPig"
+                                    <TextBlock Text="PdfPig"
                                                FontSize="18"
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,10"/>
-                                    <TextBlock Text="Version: 1.7.0-custom-5"
+                                    <TextBlock Text="Version: 0.1.16"
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
@@ -270,7 +270,7 @@
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,10"/>
-                                    <TextBlock Text="Version: 8.0.0"
+                                    <TextBlock Text="Version: 10.0.14"
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
@@ -312,7 +312,7 @@
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,10"/>
-                                    <TextBlock Text="Version: 8.0.0"
+                                    <TextBlock Text="Version: 10.0.14"
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
@@ -354,7 +354,7 @@
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,10"/>
-                                    <TextBlock Text="Version: 8.0.0"
+                                    <TextBlock Text="Version: 10.0.14"
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
@@ -395,7 +395,7 @@
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,10"/>
-                                    <TextBlock Text="Version: 8.0.0"
+                                    <TextBlock Text="Version: 10.0.14"
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
