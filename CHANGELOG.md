@@ -6,6 +6,8 @@ All notable changes are recorded from this point onward.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-13
+
 ### Added
 
 - "Remove No Metadata" button that removes PDFs without usable metadata from the list in one click. Files on disk are not touched.
@@ -22,6 +24,8 @@ All notable changes are recorded from this point onward.
 - Redesigned the main window: a unified, higher-contrast color palette, flat buttons with hover/disabled states, Segoe Fluent icons instead of emoji, a readable progress percentage and a resizable log panel that scrolls to the latest entry.
 - The empty drop area can be clicked to select files, and the window highlights while dragging files over it.
 - The language button shows "日本語" / "English".
+- Updated the English and Japanese screenshots to show the redesigned interface.
+- Align local and CI executable, fixed-name ZIP and UTF-8/LF SHA-256 output under `artifacts/release/`; preserve required distribution files and require the VirusTotal API SHA-256 to match.
 
 ### Fixed
 
@@ -30,13 +34,9 @@ All notable changes are recorded from this point onward.
 - The same file can no longer be added twice with different letter case in its path.
 - The toolbar wraps and the progress bar stretches instead of being clipped in narrow windows.
 - Column headers in the file list were blank.
+- The operation column now sizes to its translated header so the English label is not clipped.
 - Switching the language no longer overwrites filename settings changed earlier in the same session.
 - The "all metadata items disabled" warning showed resource keys instead of text.
-
-### Changed
-
-- Align local and CI executable, fixed-name ZIP and UTF-8/LF SHA-256 output under `artifacts/release/`; preserve required distribution files and require the VirusTotal API SHA-256 to match.
-
 
 ## [1.0.9] - 2026-11-10
 

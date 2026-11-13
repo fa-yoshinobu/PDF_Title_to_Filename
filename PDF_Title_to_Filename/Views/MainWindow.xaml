@@ -323,7 +323,7 @@
 
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="{Binding Data.OperationHeader, Source={StaticResource Proxy}}"
-                                                Width="44" CanUserSort="False" CanUserResize="False">
+                                                Width="SizeToHeader" MinWidth="44" CanUserSort="False" CanUserResize="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Style="{StaticResource RowIconButton}"
