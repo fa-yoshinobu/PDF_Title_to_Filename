@@ -7,37 +7,176 @@
         <ResourceDictionary>
             <!-- コンバーター -->
             <converters:LanguageToggleConverter x:Key="LanguageToggleConverter"/>
-            
-            <!-- シンプルなスタイル -->
-            <!-- シンプルなスタイル -->
-            <Style x:Key="MainButton" TargetType="Button">
-                <Setter Property="Padding" Value="15,8"/>
-                <Setter Property="Margin" Value="5"/>
+
+            <!-- ===== 配色パレット =====
+                 文字色は白背景に対して WCAG AA (4.5:1) 以上のコントラストになる色を使用。
+                 色付きのボタンは主操作（処理開始）だけにし、その他はニュートラルにする。 -->
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F3F4F6"/>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="SurfaceAltBrush" Color="#F9FAFB"/>
+            <SolidColorBrush x:Key="LineBrush" Color="#E5E7EB"/>
+            <SolidColorBrush x:Key="LineStrongBrush" Color="#D1D5DB"/>
+            <SolidColorBrush x:Key="HoverBrush" Color="#F3F4F6"/>
+            <SolidColorBrush x:Key="TextBrush" Color="#111827"/>
+            <SolidColorBrush x:Key="TextMutedBrush" Color="#4B5563"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#2563EB"/>
+            <SolidColorBrush x:Key="AccentStrongBrush" Color="#1D4ED8"/>
+            <SolidColorBrush x:Key="AccentSoftBrush" Color="#DBEAFE"/>
+            <SolidColorBrush x:Key="SuccessBrush" Color="#15803D"/>
+            <SolidColorBrush x:Key="WarningBrush" Color="#B45309"/>
+            <SolidColorBrush x:Key="WarningLineBrush" Color="#FCD34D"/>
+            <SolidColorBrush x:Key="ErrorBrush" Color="#B91C1C"/>
+            <SolidColorBrush x:Key="ErrorLineBrush" Color="#FCA5A5"/>
+            <SolidColorBrush x:Key="ProcessingBrush" Color="#6D28D9"/>
+
+            <!-- アイコンフォント（Windows 11: Segoe Fluent Icons / Windows 10: Segoe MDL2 Assets） -->
+            <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+            <Style x:Key="IconText" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
                 <Setter Property="FontSize" Value="14"/>
-                <Setter Property="Background" Value="#4CAF50"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
-            
-            <Style x:Key="SecondaryButton" TargetType="Button">
-                <Setter Property="Padding" Value="15,8"/>
-                <Setter Property="Margin" Value="5"/>
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="Background" Value="#2196F3"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter Property="BorderThickness" Value="0"/>
+
+            <!-- ===== ボタン =====
+                 ホバー/押下は半透明の黒を重ねて表現するので、どの背景色でも同じテンプレートで動く。 -->
+            <Style x:Key="FlatButtonBase" TargetType="Button">
+                <Setter Property="Padding" Value="14,7"/>
+                <Setter Property="Margin" Value="4"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="MinHeight" Value="34"/>
                 <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource LineStrongBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid x:Name="Root" SnapsToDevicePixels="True">
+                                <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="6"/>
+                                <Border x:Name="Overlay" Background="#000000" Opacity="0" CornerRadius="6"/>
+                                <Border x:Name="FocusRing" BorderBrush="{StaticResource AccentBrush}"
+                                        BorderThickness="2" CornerRadius="6" Visibility="Collapsed"/>
+                                <ContentPresenter Margin="{TemplateBinding Padding}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  RecognizesAccessKey="True"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Overlay" Property="Opacity" Value="0.06"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Overlay" Property="Opacity" Value="0.14"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="FocusRing" Property="Visibility" Value="Visible"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Root" Property="Opacity" Value="0.45"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             </Style>
-            
-            <Style x:Key="DangerButton" TargetType="Button">
-                <Setter Property="Padding" Value="15,8"/>
-                <Setter Property="Margin" Value="5"/>
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="Background" Value="#F44336"/>
+
+            <!-- 主操作（処理開始） -->
+            <Style x:Key="MainButton" TargetType="Button" BasedOn="{StaticResource FlatButtonBase}">
+                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource AccentStrongBrush}"/>
                 <Setter Property="Foreground" Value="White"/>
-                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+            </Style>
+
+            <!-- 通常操作 -->
+            <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource FlatButtonBase}"/>
+
+            <!-- 取り消しにくい操作（リストクリアなど） -->
+            <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource FlatButtonBase}">
+                <Setter Property="Foreground" Value="{StaticResource ErrorBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource ErrorLineBrush}"/>
+            </Style>
+
+            <!-- 注意が必要な操作（メタデータなしを除外など） -->
+            <Style x:Key="WarningButton" TargetType="Button" BasedOn="{StaticResource FlatButtonBase}">
+                <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource WarningLineBrush}"/>
+            </Style>
+
+            <!-- アイコンだけのボタン（設定・情報・ログクリアなど） -->
+            <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource FlatButtonBase}">
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Width" Value="34"/>
+                <Setter Property="Height" Value="34"/>
+                <Setter Property="MinHeight" Value="0"/>
+                <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+                <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+
+            <!-- 一覧の行内に置く小さなアイコンボタン -->
+            <Style x:Key="RowIconButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+                <Setter Property="Width" Value="26"/>
+                <Setter Property="Height" Value="26"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            </Style>
+
+            <!-- ステータス絞り込み用のチップ -->
+            <Style x:Key="FilterChip" TargetType="RadioButton">
+                <Setter Property="Margin" Value="0,0,6,0"/>
+                <Setter Property="Padding" Value="10,3"/>
+                <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border x:Name="Chip"
+                                    Background="{StaticResource SurfaceBrush}"
+                                    BorderBrush="{StaticResource LineStrongBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="12"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Chip" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="Chip" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="Chip" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                                    <Setter TargetName="Chip" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource AccentStrongBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- パネル（カード）の枠 -->
+            <Style x:Key="PanelBorder" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius" Value="8"/>
+                <Setter Property="Padding" Value="8"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

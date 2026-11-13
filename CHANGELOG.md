@@ -9,6 +9,19 @@ All notable changes are recorded from this point onward.
 ### Added
 
 - "Remove No Metadata" button that removes PDFs without usable metadata from the list in one click. Files on disk are not touched.
+- Status filter chips with per-status counts (All / Scheduled / No Metadata / Errors / Done).
+- Edit the new filename directly in the list (double-click or F2); clearing it goes back to the generated name.
+- Right-click menu: open file, open containing folder, copy new name, remove from list. Multi-select and the Delete key are supported.
+- Confirmation before renaming, and "Undo" for the last rename batch (Ctrl+Z).
+- Keyboard shortcuts: Ctrl+O (select files), Ctrl+Enter (run), F5 (refresh preview), Ctrl+Z (undo).
+- The window position, size and log panel height are remembered.
+- Error and status details are shown under the selected row.
+
+### Changed
+
+- Redesigned the main window: a unified, higher-contrast color palette, flat buttons with hover/disabled states, Segoe Fluent icons instead of emoji, a readable progress percentage and a resizable log panel that scrolls to the latest entry.
+- The empty drop area can be clicked to select files, and the window highlights while dragging files over it.
+- The language button shows "日本語" / "English".
 
 ### Fixed
 
@@ -16,6 +29,9 @@ All notable changes are recorded from this point onward.
 - Generated filenames are capped at 240 characters after the parts are joined, not only per part.
 - The same file can no longer be added twice with different letter case in its path.
 - The toolbar wraps and the progress bar stretches instead of being clipped in narrow windows.
+- Column headers in the file list were blank.
+- Switching the language no longer overwrites filename settings changed earlier in the same session.
+- The "all metadata items disabled" warning showed resource keys instead of text.
 
 ### Changed
 

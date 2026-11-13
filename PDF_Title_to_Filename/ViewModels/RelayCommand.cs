@@ -13,7 +13,22 @@ namespace PdfTitleRenamer.ViewModels
             _canExecute = canExecute;
         }
 
-        public event EventHandler? CanExecuteChanged;
+        private EventHandler? _canExecuteChanged;
+
+        // 明示的な RaiseCanExecuteChanged に加えて、WPF の再評価タイミング（選択変更・フォーカス移動など）でも更新する
+        public event EventHandler? CanExecuteChanged
+        {
+            add
+            {
+                _canExecuteChanged += value;
+                CommandManager.RequerySuggested += value;
+            }
+            remove
+            {
+                _canExecuteChanged -= value;
+                CommandManager.RequerySuggested -= value;
+            }
+        }
 
         public bool CanExecute(object? parameter)
         {
@@ -27,7 +42,7 @@ namespace PdfTitleRenamer.ViewModels
 
         public void RaiseCanExecuteChanged()
         {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+            _canExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -42,7 +57,22 @@ namespace PdfTitleRenamer.ViewModels
             _canExecute = canExecute;
         }
 
-        public event EventHandler? CanExecuteChanged;
+        private EventHandler? _canExecuteChanged;
+
+        // 明示的な RaiseCanExecuteChanged に加えて、WPF の再評価タイミング（選択変更・フォーカス移動など）でも更新する
+        public event EventHandler? CanExecuteChanged
+        {
+            add
+            {
+                _canExecuteChanged += value;
+                CommandManager.RequerySuggested += value;
+            }
+            remove
+            {
+                _canExecuteChanged -= value;
+                CommandManager.RequerySuggested -= value;
+            }
+        }
 
         public bool CanExecute(object? parameter)
         {
@@ -56,7 +86,7 @@ namespace PdfTitleRenamer.ViewModels
 
         public void RaiseCanExecuteChanged()
         {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+            _canExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

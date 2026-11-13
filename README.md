@@ -17,6 +17,9 @@ PDF Title to Filename is a Windows WPF app that reads PDF metadata and renames P
 - Combine metadata with the original filename, a custom prefix, or a custom suffix.
 - Preview generated filenames before renaming.
 - Remove PDFs without metadata from the list in one click (files on disk are not touched).
+- Filter the list by status, edit new names in place, and use the right-click menu.
+- Confirm before renaming and undo the last rename batch.
+- Shortcuts: `Ctrl+O` select files, `Ctrl+Enter` run, `F5` refresh preview, `Ctrl+Z` undo, `Delete` remove from list.
 - Drop files or folders; folders are scanned recursively for PDF files.
 - Avoid duplicate names by appending `(1)`, `(2)`, and so on.
 - Switch the UI language between English and Japanese.
@@ -127,6 +130,9 @@ PDF Title to Filename は、PDF のメタデータを読み取り、わかりや
 - 元ファイル名、任意の接頭辞、任意の接尾辞を組み合わせ可能
 - リネーム前に生成予定のファイル名をプレビュー
 - メタデータのない PDF をワンクリックでリストから除外（ファイル自体は削除しません）
+- ステータス別の件数表示と絞り込み、一覧上での名前の手修正、右クリックメニュー
+- リネーム前の確認と、直前のリネームの「元に戻す」
+- ショートカット: `Ctrl+O` ファイル選択、`Ctrl+Enter` 処理開始、`F5` プレビュー更新、`Ctrl+Z` 元に戻す、`Delete` リストから外す
 - ファイルまたはフォルダのドラッグ&ドロップ対応
 - フォルダ内の PDF を再帰的に検索
 - 重複ファイル名には `(1)`, `(2)` のような連番を付与

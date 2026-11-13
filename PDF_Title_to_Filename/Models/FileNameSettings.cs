@@ -50,6 +50,16 @@ namespace PdfTitleRenamer.Models
             set => SetProperty(ref _currentLanguage, value);
         }
 
+        // メインウィンドウの位置・サイズ（未保存の場合は null）
+        public double? WindowLeft { get; set; }
+        public double? WindowTop { get; set; }
+        public double? WindowWidth { get; set; }
+        public double? WindowHeight { get; set; }
+        public bool WindowMaximized { get; set; }
+
+        // ログ欄の高さ（未保存の場合は null）
+        public double? LogPanelHeight { get; set; }
+
 
 
         // 設定ファイルパスを取得

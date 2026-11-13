@@ -198,4 +198,88 @@
   <data name="RemovedNoMetadataLog" xml:space="preserve">
     <value>メタデータのないPDFをリストから除外しました</value>
   </data>
+  <data name="FileSelectionToolTip" xml:space="preserve">
+    <value>PDFファイルを選択 (Ctrl+O)</value>
+  </data>
+  <data name="ProcessStartToolTip" xml:space="preserve">
+    <value>リネームを実行 (Ctrl+Enter)</value>
+  </data>
+  <data name="ClearListToolTip" xml:space="preserve">
+    <value>リストをすべてクリア（ファイルは削除されません）</value>
+  </data>
+  <data name="UndoText" xml:space="preserve">
+    <value>元に戻す</value>
+  </data>
+  <data name="UndoToolTip" xml:space="preserve">
+    <value>直前のリネームを元に戻す (Ctrl+Z)</value>
+  </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>すべて</value>
+  </data>
+  <data name="FilterScheduled" xml:space="preserve">
+    <value>リネーム予定</value>
+  </data>
+  <data name="FilterNoMetadata" xml:space="preserve">
+    <value>メタデータなし</value>
+  </data>
+  <data name="FilterError" xml:space="preserve">
+    <value>エラー</value>
+  </data>
+  <data name="FilterDone" xml:space="preserve">
+    <value>完了・変更不要</value>
+  </data>
+  <data name="DragDropOverlay" xml:space="preserve">
+    <value>ここにドロップして追加</value>
+  </data>
+  <data name="NewNameEditToolTip" xml:space="preserve">
+    <value>ダブルクリックまたは F2 で編集できます。空にすると自動生成の名前に戻ります</value>
+  </data>
+  <data name="ManuallyEditedNote" xml:space="preserve">
+    <value>手動で編集した名前です</value>
+  </data>
+  <data name="ContextOpenFile" xml:space="preserve">
+    <value>ファイルを開く</value>
+  </data>
+  <data name="ContextOpenFolder" xml:space="preserve">
+    <value>フォルダを開く</value>
+  </data>
+  <data name="ContextCopyNewName" xml:space="preserve">
+    <value>新しい名前をコピー</value>
+  </data>
+  <data name="ContextRemoveFromList" xml:space="preserve">
+    <value>リストから外す (Delete)</value>
+  </data>
+  <data name="OpenFileError" xml:space="preserve">
+    <value>開けませんでした</value>
+  </data>
+  <data name="NothingToProcess" xml:space="preserve">
+    <value>リネームするファイルがありません</value>
+  </data>
+  <data name="ConfirmRenameTitle" xml:space="preserve">
+    <value>リネームの確認</value>
+  </data>
+  <data name="ConfirmRenameMessage" xml:space="preserve">
+    <value>{0} 件のファイルをリネームします。よろしいですか？</value>
+  </data>
+  <data name="ConfirmUndoTitle" xml:space="preserve">
+    <value>元に戻す</value>
+  </data>
+  <data name="ConfirmUndoMessage" xml:space="preserve">
+    <value>直前にリネームした {0} 件のファイルを元の名前に戻します。よろしいですか？</value>
+  </data>
+  <data name="UndoCompleteLog" xml:space="preserve">
+    <value>元の名前に戻しました</value>
+  </data>
+  <data name="UndoFailedLog" xml:space="preserve">
+    <value>元の名前に戻せませんでした</value>
+  </data>
+  <data name="UndoSourceMissing" xml:space="preserve">
+    <value>リネーム後のファイルが見つかりません</value>
+  </data>
+  <data name="UndoTargetExists" xml:space="preserve">
+    <value>元の名前のファイルが既に存在します</value>
+  </data>
+  <data name="UndoSummary" xml:space="preserve">
+    <value>元に戻す完了 - 成功: {0}件, 失敗: {1}件</value>
+  </data>
 </root>

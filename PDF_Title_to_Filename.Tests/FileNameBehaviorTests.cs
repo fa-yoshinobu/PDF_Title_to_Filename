@@ -331,6 +331,165 @@ namespace PDF_Title_to_Filename.Tests
             Assert.False(viewModel.RemoveNoMetadataFilesCommand.CanExecute(null));
         }
 
+        [Fact]
+        public void ApplyManualName_SanitizesNameAndSchedulesRename()
+        {
+            var viewModel = CreateViewModel(CreateTitleOnlySettings());
+            var item = new FileItem(@"C:\docs\old.pdf");
+            viewModel.SelectedFiles.Add(item);
+
+            viewModel.ApplyManualName(item, "  New:Name.PDF ");
+
+            Assert.True(item.IsManuallyEdited);
+            Assert.Equal("New_Name.pdf", item.NewFileName);
+            Assert.Equal("RenameScheduled", item.Status);
+        }
+
+        [Fact]
+        public void ApplyManualName_SameAsCurrentNameIsNoChange()
+        {
+            var viewModel = CreateViewModel(CreateTitleOnlySettings());
+            var item = new FileItem(Path.Combine(Path.GetTempPath(), "same.pdf"));
+            viewModel.SelectedFiles.Add(item);
+
+            viewModel.ApplyManualName(item, "same");
+
+            Assert.Equal("NoChangeNeeded", item.Status);
+        }
+
+        [Fact]
+        public void ApplyManualName_IsIgnoredForRenamedFiles()
+        {
+            var viewModel = CreateViewModel(CreateTitleOnlySettings());
+            var item = new FileItem(@"C:\docs\done.pdf") { Status = "RenameComplete", NewFileName = "Done.pdf" };
+            viewModel.SelectedFiles.Add(item);
+
+            viewModel.ApplyManualName(item, "Other");
+
+            Assert.False(item.IsManuallyEdited);
+            Assert.Equal("Done.pdf", item.NewFileName);
+        }
+
+        [Fact]
+        public void FilterLabels_ShowCountsPerStatus()
+        {
+            var viewModel = CreateViewModel(CreateTitleOnlySettings());
+            viewModel.SelectedFiles.Add(new FileItem(@"C:\docs\a.pdf") { Status = "RenameScheduled" });
+            viewModel.SelectedFiles.Add(new FileItem(@"C:\docs\b.pdf") { Status = "NoMetadata" });
+            viewModel.SelectedFiles.Add(new FileItem(@"C:\docs\c.pdf") { Status = "Error" });
+            var changing = new FileItem(@"C:\docs\d.pdf") { Status = "RenameScheduled" };
+            viewModel.SelectedFiles.Add(changing);
+
+            changing.Status = "RenameComplete";
+
+            Assert.Equal("FilterAll (4)", viewModel.FilterAllText);
+            Assert.Equal("FilterScheduled (1)", viewModel.FilterScheduledText);
+            Assert.Equal("FilterNoMetadata (1)", viewModel.FilterNoMetadataText);
+            Assert.Equal("FilterError (1)", viewModel.FilterErrorText);
+            Assert.Equal("FilterDone (1)", viewModel.FilterDoneText);
+        }
+
+        [Fact]
+        public void RemoveSelectedCommand_RemovesGivenItems()
+        {
+            var viewModel = CreateViewModel(CreateTitleOnlySettings());
+            var keep = new FileItem(@"C:\docs\keep.pdf");
+            var remove1 = new FileItem(@"C:\docs\remove1.pdf");
+            var remove2 = new FileItem(@"C:\docs\remove2.pdf");
+            viewModel.SelectedFiles.Add(remove1);
+            viewModel.SelectedFiles.Add(keep);
+            viewModel.SelectedFiles.Add(remove2);
+
+            viewModel.RemoveSelectedCommand.Execute(new List<object> { remove1, remove2 });
+
+            Assert.Same(keep, Assert.Single(viewModel.SelectedFiles));
+        }
+
+        [Fact]
+        public async Task ProcessAndUndo_RenamesAndRestoresFiles()
+        {
+            var directory = CreateTempDirectory();
+            try
+            {
+                var originalPath = Path.Combine(directory, "scan001.pdf");
+                File.WriteAllText(originalPath, "dummy");
+
+                var viewModel = CreateViewModel(CreateTitleOnlySettings());
+                var confirmations = 0;
+                viewModel.ConfirmAction = (_, _) => { confirmations++; return true; };
+                var item = new FileItem(originalPath);
+                viewModel.SelectedFiles.Add(item);
+                viewModel.ApplyManualName(item, "Manual Name");
+
+                await InvokeProcessFilesAsync(viewModel);
+
+                var renamedPath = Path.Combine(directory, "Manual Name.pdf");
+                Assert.Equal("RenameComplete", item.Status);
+                Assert.True(File.Exists(renamedPath));
+                Assert.False(File.Exists(originalPath));
+                Assert.Equal(renamedPath, item.CurrentFilePath);
+                Assert.True(viewModel.CanUndo);
+
+                viewModel.UndoCommand.Execute(null);
+
+                Assert.True(File.Exists(originalPath));
+                Assert.False(File.Exists(renamedPath));
+                Assert.Equal(originalPath, item.CurrentFilePath);
+                Assert.Equal("RenameScheduled", item.Status);
+                Assert.False(viewModel.CanUndo);
+                Assert.Equal(2, confirmations);
+            }
+            finally
+            {
+                DeleteDirectory(directory);
+            }
+        }
+
+        [Fact]
+        public async Task Process_DoesNothingWhenConfirmationIsDeclined()
+        {
+            var directory = CreateTempDirectory();
+            try
+            {
+                var originalPath = Path.Combine(directory, "scan002.pdf");
+                File.WriteAllText(originalPath, "dummy");
+
+                var viewModel = CreateViewModel(CreateTitleOnlySettings());
+                viewModel.ConfirmAction = (_, _) => false;
+                var item = new FileItem(originalPath);
+                viewModel.SelectedFiles.Add(item);
+                viewModel.ApplyManualName(item, "Other Name");
+
+                await InvokeProcessFilesAsync(viewModel);
+
+                Assert.True(File.Exists(originalPath));
+                Assert.Equal("RenameScheduled", item.Status);
+                Assert.False(viewModel.CanUndo);
+            }
+            finally
+            {
+                DeleteDirectory(directory);
+            }
+        }
+
+        private static FileNameSettings CreateTitleOnlySettings()
+        {
+            return new FileNameSettings
+            {
+                Elements = new ObservableCollection<FileNameElement>
+                {
+                    new("Title", true)
+                }
+            };
+        }
+
+        private static Task InvokeProcessFilesAsync(MainWindowViewModel viewModel)
+        {
+            var method = typeof(MainWindowViewModel).GetMethod("ProcessFilesAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.NotNull(method);
+            return Assert.IsAssignableFrom<Task>(method.Invoke(viewModel, null));
+        }
+
         private static PdfProcessingService CreatePdfProcessingService()
         {
             return new PdfProcessingService(

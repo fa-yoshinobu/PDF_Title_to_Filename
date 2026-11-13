@@ -198,4 +198,88 @@
   <data name="RemovedNoMetadataLog" xml:space="preserve">
     <value>Removed PDFs without metadata from the list</value>
   </data>
+  <data name="FileSelectionToolTip" xml:space="preserve">
+    <value>Select PDF files (Ctrl+O)</value>
+  </data>
+  <data name="ProcessStartToolTip" xml:space="preserve">
+    <value>Run rename (Ctrl+Enter)</value>
+  </data>
+  <data name="ClearListToolTip" xml:space="preserve">
+    <value>Clear the whole list (files are not deleted)</value>
+  </data>
+  <data name="UndoText" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="UndoToolTip" xml:space="preserve">
+    <value>Undo the last rename (Ctrl+Z)</value>
+  </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="FilterScheduled" xml:space="preserve">
+    <value>Scheduled</value>
+  </data>
+  <data name="FilterNoMetadata" xml:space="preserve">
+    <value>No Metadata</value>
+  </data>
+  <data name="FilterError" xml:space="preserve">
+    <value>Errors</value>
+  </data>
+  <data name="FilterDone" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="DragDropOverlay" xml:space="preserve">
+    <value>Drop here to add</value>
+  </data>
+  <data name="NewNameEditToolTip" xml:space="preserve">
+    <value>Double-click or press F2 to edit. Clear it to go back to the generated name</value>
+  </data>
+  <data name="ManuallyEditedNote" xml:space="preserve">
+    <value>Name edited manually</value>
+  </data>
+  <data name="ContextOpenFile" xml:space="preserve">
+    <value>Open File</value>
+  </data>
+  <data name="ContextOpenFolder" xml:space="preserve">
+    <value>Open Containing Folder</value>
+  </data>
+  <data name="ContextCopyNewName" xml:space="preserve">
+    <value>Copy New Name</value>
+  </data>
+  <data name="ContextRemoveFromList" xml:space="preserve">
+    <value>Remove from List (Delete)</value>
+  </data>
+  <data name="OpenFileError" xml:space="preserve">
+    <value>Could not open</value>
+  </data>
+  <data name="NothingToProcess" xml:space="preserve">
+    <value>There are no files to rename</value>
+  </data>
+  <data name="ConfirmRenameTitle" xml:space="preserve">
+    <value>Confirm Rename</value>
+  </data>
+  <data name="ConfirmRenameMessage" xml:space="preserve">
+    <value>Rename {0} file(s)?</value>
+  </data>
+  <data name="ConfirmUndoTitle" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="ConfirmUndoMessage" xml:space="preserve">
+    <value>Restore the original names of the {0} file(s) renamed last time?</value>
+  </data>
+  <data name="UndoCompleteLog" xml:space="preserve">
+    <value>Restored original name</value>
+  </data>
+  <data name="UndoFailedLog" xml:space="preserve">
+    <value>Could not restore original name</value>
+  </data>
+  <data name="UndoSourceMissing" xml:space="preserve">
+    <value>The renamed file was not found</value>
+  </data>
+  <data name="UndoTargetExists" xml:space="preserve">
+    <value>A file with the original name already exists</value>
+  </data>
+  <data name="UndoSummary" xml:space="preserve">
+    <value>Undo finished - restored: {0}, failed: {1}</value>
+  </data>
 </root>
