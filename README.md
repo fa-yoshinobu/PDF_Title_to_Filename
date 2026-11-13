@@ -16,6 +16,7 @@ PDF Title to Filename is a Windows WPF app that reads PDF metadata and renames P
 - Batch rename PDF files from metadata such as title, author, subject, and keywords.
 - Combine metadata with the original filename, a custom prefix, or a custom suffix.
 - Preview generated filenames before renaming.
+- Remove PDFs without metadata from the list in one click (files on disk are not touched).
 - Drop files or folders; folders are scanned recursively for PDF files.
 - Avoid duplicate names by appending `(1)`, `(2)`, and so on.
 - Switch the UI language between English and Japanese.
@@ -33,7 +34,7 @@ Filename generation is controlled in the settings window.
 - Repeated whitespace is collapsed to one space and leading/trailing whitespace is trimmed.
 - Empty sanitized names fall back to `Untitled`.
 - Windows reserved names such as `CON` and `PRN` are prefixed with `_`.
-- Names are trimmed to 240 characters before `.pdf` is added.
+- Each part and the joined name are trimmed to 240 characters before `.pdf` is added.
 
 ### NFKC Normalization
 
@@ -125,6 +126,7 @@ PDF Title to Filename は、PDF のメタデータを読み取り、わかりや
 - PDF の Title / Author / Subject / Keywords からファイル名を生成
 - 元ファイル名、任意の接頭辞、任意の接尾辞を組み合わせ可能
 - リネーム前に生成予定のファイル名をプレビュー
+- メタデータのない PDF をワンクリックでリストから除外（ファイル自体は削除しません）
 - ファイルまたはフォルダのドラッグ&ドロップ対応
 - フォルダ内の PDF を再帰的に検索
 - 重複ファイル名には `(1)`, `(2)` のような連番を付与
@@ -143,7 +145,7 @@ PDF Title to Filename は、PDF のメタデータを読み取り、わかりや
 - 連続空白は 1 つにまとめ、前後の空白を削除します。
 - サニタイズ後に空になった場合は `Untitled` にします。
 - `CON` や `PRN` などの Windows 予約語は先頭に `_` を付けます。
-- `.pdf` を付ける前に 240 文字へ切り詰めます。
+- 各要素および結合後の名前を、`.pdf` を付ける前に 240 文字へ切り詰めます。
 
 ### NFKC 正規化
 

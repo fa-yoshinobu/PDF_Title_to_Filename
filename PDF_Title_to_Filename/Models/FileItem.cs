@@ -22,6 +22,9 @@ namespace PdfTitleRenamer.Models
 
         public string FilePath { get; }
         public string FileName { get; }
+
+        // 有効なメタデータ項目に値があるか（メタデータ読み取り前は true）
+        public bool HasMetadata { get; set; } = true;
         
         public string NewFileName
         {

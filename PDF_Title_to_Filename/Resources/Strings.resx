@@ -189,4 +189,13 @@
   <data name="NoMetadataSettingsWarningTitle" xml:space="preserve">
     <value>Settings Warning</value>
   </data>
+  <data name="RemoveNoMetadata" xml:space="preserve">
+    <value>Remove No Metadata</value>
+  </data>
+  <data name="RemoveNoMetadataToolTip" xml:space="preserve">
+    <value>Remove PDFs without metadata from the list (the files themselves are not deleted)</value>
+  </data>
+  <data name="RemovedNoMetadataLog" xml:space="preserve">
+    <value>Removed PDFs without metadata from the list</value>
+  </data>
 </root>

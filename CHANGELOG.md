@@ -6,6 +6,17 @@ All notable changes are recorded from this point onward.
 
 ## [Unreleased]
 
+### Added
+
+- "Remove No Metadata" button that removes PDFs without usable metadata from the list in one click. Files on disk are not touched.
+
+### Fixed
+
+- Changing settings after a rename no longer resets renamed files to "No Metadata".
+- Generated filenames are capped at 240 characters after the parts are joined, not only per part.
+- The same file can no longer be added twice with different letter case in its path.
+- The toolbar wraps and the progress bar stretches instead of being clipped in narrow windows.
+
 ### Changed
 
 - Align local and CI executable, fixed-name ZIP and UTF-8/LF SHA-256 output under `artifacts/release/`; preserve required distribution files and require the VirusTotal API SHA-256 to match.

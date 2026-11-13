@@ -4,7 +4,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:viewmodels="clr-namespace:PdfTitleRenamer.ViewModels"
-        Title="PDF Title to Filename" Height="650" Width="800"
+        Title="PDF Title to Filename" Height="650" Width="900"
         MinHeight="500" MinWidth="650"
         WindowStartupLocation="CenterScreen"
         AllowDrop="True"
@@ -30,13 +30,13 @@
                 <DropShadowEffect ShadowDepth="2" BlurRadius="8" Opacity="0.1"/>
             </Border.Effect>
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
                 
-                <!-- Action Buttons (Left) -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,20,0">
+                <!-- Action Buttons (Top, wraps when the window is narrow) -->
+                <WrapPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Button Command="{Binding SelectFilesCommand}"
                             Style="{StaticResource SecondaryButton}">
                         <StackPanel Orientation="Horizontal">
@@ -60,6 +60,17 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🗑" Margin="0,0,5,0"/>
                             <TextBlock Text="{Binding ClearListText}"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Command="{Binding RemoveNoMetadataFilesCommand}"
+                            Style="{StaticResource DangerButton}"
+                            Background="#D97706"
+                            ToolTip="{Binding RemoveNoMetadataToolTip}"
+                            ToolTipService.ShowOnDisabled="True">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚠️" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding RemoveNoMetadataText}"/>
                         </StackPanel>
                     </Button>
                     
@@ -100,10 +111,10 @@
                             <TextBlock Text="{Binding CurrentLanguageDisplay}"/>
                         </StackPanel>
                     </Button>
-                </StackPanel>
+                </WrapPanel>
                 
-                <!-- Progress Info (Right) -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,0,0">
+                <!-- Progress Info (Bottom) -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="5,4,5,2">
                     <!-- File Count -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,3">
                         <TextBlock Text="📁" FontSize="11" VerticalAlignment="Center" Margin="0,0,3,0"/>
@@ -128,9 +139,7 @@
                         <ProgressBar Value="{Binding ProgressValue}" 
                                    Maximum="100" 
                                    Height="10"
-                                   Background="#E5E7EB"
-                                   HorizontalAlignment="Left"
-                                   Width="300">
+                                   Background="#E5E7EB">
                             <ProgressBar.Foreground>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                     <GradientStop Color="#10B981" Offset="0"/>

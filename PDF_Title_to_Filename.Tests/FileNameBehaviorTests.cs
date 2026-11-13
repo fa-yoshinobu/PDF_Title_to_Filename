@@ -285,6 +285,52 @@ namespace PDF_Title_to_Filename.Tests
             Assert.Equal("A - B - ＯＲＩＧ", result);
         }
 
+        [Fact]
+        public void SanitizeFileNameWithNfkcControl_TruncatesJoinedNameTo240Characters()
+        {
+            var settings = new FileNameSettings
+            {
+                Separator = " - ",
+                Elements = new ObservableCollection<FileNameElement>
+                {
+                    new("Title", true),
+                    new("Author", true)
+                }
+            };
+            var viewModel = CreateViewModel(settings);
+            var generatedParts = settings.GenerateFileNameParts("orig.pdf", new string('a', 200), new string('b', 200), "", "");
+
+            var result = InvokeSanitizeFileNameWithNfkcControl(viewModel, generatedParts);
+
+            Assert.Equal(240, result.Length);
+            Assert.StartsWith(new string('a', 200) + " - ", result, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        public void RemoveNoMetadataFilesCommand_RemovesOnlyFilesWithoutMetadata()
+        {
+            var settings = new FileNameSettings
+            {
+                Elements = new ObservableCollection<FileNameElement>
+                {
+                    new("Title", true)
+                }
+            };
+            var viewModel = CreateViewModel(settings);
+            var withMetadata = new FileItem(@"C:\docs\with.pdf");
+            var withoutMetadata1 = new FileItem(@"C:\docs\without1.pdf") { HasMetadata = false };
+            var withoutMetadata2 = new FileItem(@"C:\docs\without2.pdf") { HasMetadata = false };
+            viewModel.SelectedFiles.Add(withoutMetadata1);
+            viewModel.SelectedFiles.Add(withMetadata);
+            viewModel.SelectedFiles.Add(withoutMetadata2);
+
+            Assert.True(viewModel.RemoveNoMetadataFilesCommand.CanExecute(null));
+            viewModel.RemoveNoMetadataFilesCommand.Execute(null);
+
+            Assert.Same(withMetadata, Assert.Single(viewModel.SelectedFiles));
+            Assert.False(viewModel.RemoveNoMetadataFilesCommand.CanExecute(null));
+        }
+
         private static PdfProcessingService CreatePdfProcessingService()
         {
             return new PdfProcessingService(

@@ -28,6 +28,9 @@ namespace PdfTitleRenamer.ViewModels
         private const string STATUS_NO_CHANGE_NEEDED = "NoChangeNeeded";
         private const string STATUS_ERROR = "Error";
 
+        // 拡張子を除いたファイル名の最大文字数
+        private const int MaxFileNameLength = 240;
+
         private readonly IPdfProcessingService _pdfProcessingService;
         private readonly ILogService _logService;
         private readonly ILanguageService _languageService;
@@ -75,6 +78,7 @@ namespace PdfTitleRenamer.ViewModels
             ProcessFilesCommand = new RelayCommand(async () => await ProcessFilesAsync(), () => HasFiles && !IsProcessing && HasValidMetadataSettings());
             ClearFilesCommand = new RelayCommand(ClearFiles, () => HasFiles);
             RemoveFileCommand = new RelayCommand<FileItem>(RemoveFile);
+            RemoveNoMetadataFilesCommand = new RelayCommand(RemoveNoMetadataFiles, () => !IsProcessing && SelectedFiles.Any(f => !f.HasMetadata));
             ClearLogCommand = new RelayCommand(ClearLog);
             ShowAboutCommand = new RelayCommand(ShowAbout);
             ShowSettingsCommand = new RelayCommand(ShowSettings);
@@ -86,6 +90,7 @@ namespace PdfTitleRenamer.ViewModels
                 {
                     (ProcessFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
                     (ClearFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                    (RemoveNoMetadataFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
             };
             
@@ -129,6 +134,8 @@ namespace PdfTitleRenamer.ViewModels
         public string FileSelectionText => _languageService.GetString("FileSelection");
         public string ProcessStartText => _languageService.GetString("ProcessStart");
         public string ClearListText => _languageService.GetString("ClearList");
+        public string RemoveNoMetadataText => _languageService.GetString("RemoveNoMetadata");
+        public string RemoveNoMetadataToolTip => _languageService.GetString("RemoveNoMetadataToolTip");
         public string CurrentNameText => _languageService.GetString("CurrentName");
         public string NewNameText => _languageService.GetString("NewName");
         public string StatusText => _languageService.GetString("Status");
@@ -166,6 +173,7 @@ namespace PdfTitleRenamer.ViewModels
         public ICommand ProcessFilesCommand { get; }
         public ICommand ClearFilesCommand { get; }
         public ICommand RemoveFileCommand { get; }
+        public ICommand RemoveNoMetadataFilesCommand { get; }
         public ICommand ClearLogCommand { get; }
         public ICommand ShowAboutCommand { get; }
         public ICommand ShowSettingsCommand { get; }
@@ -178,7 +186,8 @@ namespace PdfTitleRenamer.ViewModels
             {
                 if (File.Exists(filePath) && filePath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (!SelectedFiles.Any(f => f.FilePath == filePath))
+                    // Windowsのパスは大文字小文字を区別しないため、同じファイルの二重登録を防ぐ
+                    if (!SelectedFiles.Any(f => string.Equals(f.FilePath, filePath, StringComparison.OrdinalIgnoreCase)))
                     {
                         var fileItem = new FileItem(filePath);
                         SelectedFiles.Add(fileItem);
@@ -236,6 +245,7 @@ namespace PdfTitleRenamer.ViewModels
                     metadata.Subject ?? string.Empty,
                     metadata.Keywords ?? string.Empty);
                 var generatedFileName = JoinFileNameParts(generatedParts);
+                fileItem.HasMetadata = HasUsableMetadata(metadata);
 
 #if ENABLE_DETAILED_LOGGING
                 // ファイル名生成の詳細ログ
@@ -291,6 +301,10 @@ namespace PdfTitleRenamer.ViewModels
                 fileItem.NewFileName = "Error";
                 fileItem.Status = STATUS_ERROR;
                 fileItem.ErrorDetails = $"{_languageService.GetString("MetadataExtractionError")}: {ex.Message}";
+            }
+            finally
+            {
+                (RemoveNoMetadataFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
         }
 
@@ -379,6 +393,7 @@ namespace PdfTitleRenamer.ViewModels
                             metadata.Subject ?? string.Empty,
                             metadata.Keywords ?? string.Empty);
                         var generatedFileName = JoinFileNameParts(generatedParts);
+                        fileItem.HasMetadata = HasUsableMetadata(metadata);
 
                         if (string.IsNullOrWhiteSpace(generatedFileName))
                         {
@@ -454,6 +469,7 @@ namespace PdfTitleRenamer.ViewModels
             finally
             {
                 IsProcessing = false;
+                (RemoveNoMetadataFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
         }
 
@@ -462,6 +478,7 @@ namespace PdfTitleRenamer.ViewModels
             SelectedFiles.Clear();
             OnPropertyChanged(nameof(HasFiles));
             OnPropertyChanged(nameof(FileCountText));
+            (RemoveNoMetadataFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
         }
 
         private void RemoveFile(FileItem? fileItem)
@@ -471,7 +488,30 @@ namespace PdfTitleRenamer.ViewModels
                 SelectedFiles.Remove(fileItem);
                 OnPropertyChanged(nameof(HasFiles));
                 OnPropertyChanged(nameof(FileCountText));
+                (RemoveNoMetadataFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
+        }
+
+        /// <summary>
+        /// メタデータのないPDFをリストから除外する（ディスク上のファイルは変更しない）
+        /// </summary>
+        private void RemoveNoMetadataFiles()
+        {
+            if (IsProcessing) return;
+
+            var targets = SelectedFiles.Where(f => !f.HasMetadata).ToList();
+            if (targets.Count == 0) return;
+
+            foreach (var fileItem in targets)
+            {
+                SelectedFiles.Remove(fileItem);
+            }
+
+            OnPropertyChanged(nameof(HasFiles));
+            OnPropertyChanged(nameof(FileCountText));
+            (RemoveNoMetadataFilesCommand as RelayCommand)?.RaiseCanExecuteChanged();
+
+            _logService.LogInfo($"{_languageService.GetString("RemovedNoMetadataLog")}: {targets.Count}{_languageService.GetString("FilesUnit")}");
         }
 
         private void ClearLog()
@@ -553,7 +593,10 @@ namespace PdfTitleRenamer.ViewModels
 
         private async Task UpdateAllFilePreviewsAsync()
         {
-            foreach (var fileItem in SelectedFiles)
+            // 更新中にリストが変更されても例外にならないようスナップショットを使う。
+            // リネーム済みのファイルは元のパスに存在しないため、プレビューを再計算しない。
+            var targets = SelectedFiles.Where(f => f.Status != STATUS_RENAME_COMPLETE).ToList();
+            foreach (var fileItem in targets)
             {
                 await SetPredictedFileNameAsync(fileItem);
             }
@@ -603,6 +646,19 @@ namespace PdfTitleRenamer.ViewModels
             return _settings.Elements.Any(e => e.IsEnabled && metadataElements.Contains(e.ElementType));
         }
 
+        private bool HasUsableMetadata(PdfMetadata metadata)
+        {
+            // 有効なPDFメタデータ項目のいずれかに値があるかチェック
+            return _settings.Elements.Any(e => e.IsEnabled && !string.IsNullOrWhiteSpace(e.ElementType switch
+            {
+                "Title" => metadata.Title,
+                "Author" => metadata.Author,
+                "Subject" => metadata.Subject,
+                "Keywords" => metadata.Keywords,
+                _ => null
+            }));
+        }
+
         private string JoinFileNameParts(IReadOnlyList<FileNamePart> parts)
         {
             return string.Join(_settings.Separator, parts.Select(part => part.Value));
@@ -629,7 +685,15 @@ namespace PdfTitleRenamer.ViewModels
             }
 
             // セパレータで結合
-            return string.Join(_settings.Separator, sanitizedParts);
+            var joined = string.Join(_settings.Separator, sanitizedParts);
+
+            // 各要素は240文字以内でも、結合後にWindowsのファイル名上限を超えることがあるため全体も切り詰める
+            if (joined.Length > MaxFileNameLength)
+            {
+                joined = joined.Substring(0, MaxFileNameLength).TrimEnd();
+            }
+
+            return joined;
         }
     }
 }

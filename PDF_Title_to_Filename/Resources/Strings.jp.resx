@@ -189,4 +189,13 @@
   <data name="NoMetadataSettingsWarningTitle" xml:space="preserve">
     <value>設定警告</value>
   </data>
+  <data name="RemoveNoMetadata" xml:space="preserve">
+    <value>メタデータなしを除外</value>
+  </data>
+  <data name="RemoveNoMetadataToolTip" xml:space="preserve">
+    <value>メタデータのないPDFをリストから除外します（ファイル自体は削除されません）</value>
+  </data>
+  <data name="RemovedNoMetadataLog" xml:space="preserve">
+    <value>メタデータのないPDFをリストから除外しました</value>
+  </data>
 </root>
