@@ -4,7 +4,7 @@ GitHub Markdown task lists: `- [ ]` open, `- [x]` completed.
 
 ## Open
 
-No open checklist items.
+- [ ] 次回リリースで固定名ZIP・SHA-256・英語本文と、公開ZIP内の全EXEのVirusTotal解析完了・APIハッシュ一致・結果掲載を確認する。
 
 
 ## Completed

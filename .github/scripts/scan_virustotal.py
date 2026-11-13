@@ -24,6 +24,12 @@ class ScanError(Exception):
     pass
 
 
+class ApiError(ScanError):
+    def __init__(self, status, operation):
+        self.status = status
+        super().__init__(f"VirusTotal {operation} failed (HTTP {status}).")
+
+
 class NoRedirect(request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         raise ScanError("VirusTotal returned an unexpected redirect.")
@@ -88,6 +94,15 @@ class VirusTotalClient:
                 or parsed.username or parsed.password or parsed.port not in {None, 443}):
             host = "".join(char for char in (parsed.hostname or "missing") if char.isascii() and (char.isalnum() or char in ".-"))[:200]
             raise ScanError(f"VirusTotal returned an unsupported upload host ({host}).")
+        operation = "API request"
+        if parsed.path.startswith("/api/v3/analyses/"):
+            operation = "analysis lookup"
+        elif parsed.path.endswith("/analyse"):
+            operation = "file reanalysis"
+        elif method == "POST":
+            operation = "file upload"
+        elif parsed.path.endswith("/files/upload_url"):
+            operation = "upload endpoint lookup"
         for attempt in range(3):
             self.pause(max(0, self.next_request - self.clock()))
             # The public API permits four requests per minute. Also space retries.
@@ -106,11 +121,13 @@ class VirusTotalClient:
             except error.HTTPError as ex:
                 status = ex.code
                 ex.close()
-                if method == "GET" and status in {429, 500, 502, 503, 504} and attempt < 2:
+                if (method == "GET" and attempt < 2
+                        and (status in {429, 500, 502, 503, 504}
+                             or (status == 404 and operation == "analysis lookup"))):
                     self.pause(60)
                     continue
                 # Never print the response, API key, or one-time upload URL.
-                raise ScanError(f"VirusTotal API request failed (HTTP {status}).") from None
+                raise ApiError(status, operation) from None
             except (error.URLError, socket.timeout, TimeoutError, OSError, HTTPException):
                 raise ScanError("VirusTotal API connection failed; analysis is not complete.") from None
             except (ValueError, UnicodeError):
@@ -127,7 +144,13 @@ class VirusTotalClient:
             upload_url = secure_upload_url(self.call("GET", API + "/files/upload_url").get("data"))
         boundary = "release-" + uuid.uuid4().hex
         body, length = multipart_file(path, boundary)
-        receipt = self.call("POST", upload_url, body, f"multipart/form-data; boundary={boundary}", length)
+        try:
+            receipt = self.call("POST", upload_url, body, f"multipart/form-data; boundary={boundary}", length)
+        except ApiError as ex:
+            if ex.status != 409:
+                raise
+            # An already-known file can be analysed by hash without uploading it again.
+            receipt = self.call("POST", API + "/files/" + digest + "/analyse")
         analysis_id = receipt.get("data", {}).get("id")
         if not isinstance(analysis_id, str) or not analysis_id or len(analysis_id) > 512:
             raise ScanError("VirusTotal did not return an analysis identifier.")
@@ -153,8 +176,11 @@ def completed_report(filename, digest, analysis_id, analysis):
             or any(type(value) is not int or value < 0 for value in stats.values())
             or sum(stats[key] for key in required) == 0):
         raise ScanError("VirusTotal completed without usable engine results.")
-    reported_hash = analysis.get("meta", {}).get("file_info", {}).get("sha256")
-    if reported_hash and reported_hash.lower() != digest:
+    meta = analysis.get("meta")
+    file_info = meta.get("file_info") if isinstance(meta, dict) else None
+    reported_hash = file_info.get("sha256") if isinstance(file_info, dict) else None
+    if (not isinstance(reported_hash, str) or len(reported_hash) != 64
+            or reported_hash.lower() != digest):
         raise ScanError("VirusTotal analysis does not match the submitted executable.")
     detections = []
     results = attributes.get("results", {})
