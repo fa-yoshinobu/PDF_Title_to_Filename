@@ -9,8 +9,8 @@ Requirements: Windows 10 or Windows 11 (x64). The .NET 10.0.14 runtime is includ
 
 ## Changes
 ### Changed
-- Updated the bundled .NET runtime and Microsoft.Extensions libraries to 10.0.14 and PdfPig to 0.1.16.
-- Refreshed the application icon with a PDF page and filename field design, including sizes from 16 to 256 pixels.
+- Align local and CI executable, fixed-name distribution ZIP and SHA-256 output under `artifacts/release/`.
+- Require the VirusTotal API SHA-256 to match every published executable before reporting a completed scan.
 
 <!-- virustotal:start -->
 {{VIRUSTOTAL_CONTENT}}

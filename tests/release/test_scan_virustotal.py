@@ -1,3 +1,4 @@
+import hashlib
 import io
 from http.client import IncompleteRead
 import json
@@ -13,8 +14,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / ".github" / "script
 import scan_virustotal as scanner
 
 
+TEST_EXE_BYTES = b"MZ-release-test-only"
+TEST_SHA256 = hashlib.sha256(TEST_EXE_BYTES).hexdigest()
+
+
 def analysis(malicious=0, suspicious=0, status="completed"):
-    return {"data": {"attributes": {
+    return {"meta": {"file_info": {"sha256": TEST_SHA256}}, "data": {"attributes": {
         "status": status,
         "stats": {"malicious": malicious, "suspicious": suspicious, "undetected": 60, "harmless": 0,
                   "failure": 1, "timeout": 0, "confirmed-timeout": 0, "type-unsupported": 2},
@@ -54,7 +59,7 @@ class VirusTotalTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.directory = Path(self.temp.name)
         self.exe = self.directory / "PidSimulator.exe"
-        self.exe.write_bytes(b"MZ-release-test-only")
+        self.exe.write_bytes(TEST_EXE_BYTES)
 
     def client(self, responses, timeout=300):
         clock = FakeClock()
@@ -78,6 +83,29 @@ class VirusTotalTests(unittest.TestCase):
         self.assertIn(b'filename="PidSimulator.exe"', upload)
         self.assertNotIn(str(self.directory).encode(), upload)
         self.assertTrue(all(later[0] - earlier[0] >= 16 for earlier, later in zip(opener.calls, opener.calls[1:])))
+
+    def test_conflicting_upload_requests_reanalysis_of_exact_hash(self):
+        conflict = HTTPError(scanner.API, 409, "private detail", {}, io.BytesIO())
+        client, opener = self.client([conflict, {"data": {"id": "new-analysis"}}, analysis()])
+        report = client.scan(self.exe, 30)
+        self.assertEqual("completed", report["status"])
+        self.assertEqual(scanner.API + "/files/" + scanner.sha256_file(self.exe) + "/analyse",
+                         opener.calls[1][1].full_url)
+        self.assertIsNone(opener.calls[1][2])
+
+    def test_analysis_lookup_retries_temporary_not_found_without_reupload(self):
+        missing = HTTPError(scanner.API, 404, "private detail", {}, io.BytesIO())
+        client, opener = self.client([{"data": {"id": "new-analysis"}}, missing, analysis()])
+        self.assertEqual("completed", client.scan(self.exe, 30)["status"])
+        self.assertEqual(1, sum(req.method == "POST" for _, req, _ in opener.calls))
+        self.assertGreaterEqual(opener.calls[2][0] - opener.calls[1][0], 60)
+
+    def test_persistent_analysis_not_found_is_not_success(self):
+        responses = [{"data": {"id": "new-analysis"}}] + [
+            HTTPError(scanner.API, 404, "private detail", {}, io.BytesIO()) for _ in range(3)]
+        client, _ = self.client(responses)
+        with self.assertRaisesRegex(scanner.ScanError, "analysis lookup failed .*404"):
+            client.scan(self.exe, 30)
 
     def test_large_file_uses_one_time_upload_url(self):
         endpoint = "https://bigfiles.virustotal.com/upload/example"
@@ -164,18 +192,36 @@ class VirusTotalTests(unittest.TestCase):
                 response = analysis()
                 response["data"]["attributes"]["stats"] = stats
                 with self.assertRaises(scanner.ScanError):
-                    scanner.completed_report(self.exe.name, "abc", "123", response)
+                    scanner.completed_report(self.exe.name, TEST_SHA256, "123", response)
+
+    def test_missing_or_invalid_api_hash_is_incomplete(self):
+        for meta in ({}, None, [], {"file_info": None}, {"file_info": []},
+                     {"file_info": {}}, {"file_info": {"sha256": None}},
+                     {"file_info": {"sha256": 123}}, {"file_info": {"sha256": ""}},
+                     {"file_info": {"sha256": "g" * 64}},
+                     {"file_info": {"sha256": "0" * 64}}):
+            with self.subTest(meta=meta):
+                response = analysis()
+                response["meta"] = meta
+                client, _ = self.client([{"data": {"id": "123"}}, response])
+                output = self.directory / "invalid-hash-report"
+                with patch.object(scanner, "VirusTotalClient", return_value=client):
+                    code = scanner.main(["--file", str(self.exe), "--output-dir", str(output)])
+                self.assertEqual(1, code)
+                report = json.loads((output / "virustotal.json").read_text(encoding="utf-8"))
+                self.assertEqual("incomplete", report["status"])
+                self.assertIn("does not match", report["error"])
 
     def test_mismatched_hash_rejected(self):
         response = analysis()
-        response["meta"] = {"file_info": {"sha256": "different"}}
+        response["meta"] = {"file_info": {"sha256": "0" * 64}}
         with self.assertRaises(scanner.ScanError):
             scanner.completed_report(self.exe.name, scanner.sha256_file(self.exe), "123", response)
 
     def test_engine_markdown_cannot_inject_html_or_table_rows(self):
         response = analysis(1)
         response["data"]["attributes"]["results"] = {"<img> | AV\nrow": {"category": "malicious", "result": "<script>"}}
-        report = scanner.completed_report(self.exe.name, "abc", "123", response)
+        report = scanner.completed_report(self.exe.name, TEST_SHA256, "123", response)
         markdown = scanner.report_markdown(report)
         self.assertNotIn("<img>", markdown)
         self.assertNotIn("<script>", markdown)

@@ -39,12 +39,12 @@ jobs:
         run: dotnet test PDF_Title_to_Filename.sln -c Release --verbosity normal
 
       - name: Publish single-file executable
-        run: dotnet publish PDF_Title_to_Filename\PDF_Title_to_Filename.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts\publish
+        run: dotnet publish PDF_Title_to_Filename\PDF_Title_to_Filename.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts\release
 
       - name: Verify publish output
         shell: pwsh
         run: |
-          $exe = "artifacts/publish/PDF_Title_to_Filename.exe"
+          $exe = "artifacts/release/PDF_Title_to_Filename.exe"
           if (-not (Test-Path $exe)) {
             throw "Single-file executable was not created: $exe"
           }

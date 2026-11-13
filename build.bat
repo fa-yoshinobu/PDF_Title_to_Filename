@@ -6,7 +6,7 @@ cd /d "%~dp0"
 set "PROJECT=PDF_Title_to_Filename\PDF_Title_to_Filename.csproj"
 set "CONFIG=Release"
 set "RUNTIME=win-x64"
-set "OUTDIR=artifacts\publish"
+set "OUTDIR=artifacts\release"
 set "DO_CLEAN=0"
 
 if /I "%~1"=="clean" set "DO_CLEAN=1"
@@ -30,7 +30,7 @@ if "%DO_CLEAN%"=="1" (
 )
 
 echo [1/3] restore...
-dotnet restore "%PROJECT%"
+dotnet restore "%PROJECT%" -r %RUNTIME%
 if errorlevel 1 goto :error
 
 echo [2/3] publish single-file exe...
@@ -45,6 +45,9 @@ dotnet publish "%PROJECT%" ^
   /p:DebugType=None ^
   /p:DebugSymbols=false ^
   -o "%OUTDIR%"
+if errorlevel 1 goto :error
+
+powershell -NoProfile -File "%~dp0.github\scripts\package_release.ps1" -OutputDirectory "%OUTDIR%" -Runtime "%RUNTIME%"
 if errorlevel 1 goto :error
 
 echo [3/3] done.
