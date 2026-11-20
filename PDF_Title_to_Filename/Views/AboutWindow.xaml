@@ -270,7 +270,7 @@
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,10"/>
-                                    <TextBlock Text="Version: 10.0.14"
+                                    <TextBlock Text="Version: 10.0.15"
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
@@ -312,7 +312,7 @@
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,10"/>
-                                    <TextBlock Text="Version: 10.0.14"
+                                    <TextBlock Text="Version: 10.0.15"
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
@@ -354,7 +354,7 @@
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,10"/>
-                                    <TextBlock Text="Version: 10.0.14"
+                                    <TextBlock Text="Version: 10.0.15"
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>
@@ -395,7 +395,7 @@
                                                FontWeight="Bold"
                                                Foreground="#1E40AF"
                                                Margin="0,0,0,10"/>
-                                    <TextBlock Text="Version: 10.0.14"
+                                    <TextBlock Text="Version: 10.0.15"
                                                FontSize="14"
                                                Foreground="#6B7280"
                                                Margin="0,0,0,5"/>

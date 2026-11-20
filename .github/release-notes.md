@@ -5,7 +5,7 @@
 ## Getting started
 Extract the ZIP file, then run `PDF_Title_to_Filename.exe`.
 
-Requirements: Windows 10 or Windows 11 (x64). The .NET 10.0.14 runtime is included.
+Requirements: Windows 10 or Windows 11 (x64). The .NET 10.0.15 runtime is included.
 
 ## Changes
 ### Added

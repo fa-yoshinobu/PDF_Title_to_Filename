@@ -6,6 +6,10 @@ All notable changes are recorded from this point onward.
 
 ## [Unreleased]
 
+### Security
+
+- Updated the bundled .NET runtime and Microsoft.Extensions packages to 10.0.15.
+
 ## [1.1.0] - 2026-11-13
 
 ### Added
